@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		0834009E0B3D0B590A4B6B54 /* Pods_EnglishGuess.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBA41C50DF7A4D75BBDA8503 /* Pods_EnglishGuess.framework */; };
+		610801EB1E6E9DF300E2EA33 /* Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610801EA1E6E9DF300E2EA33 /* Recording.swift */; };
+		610801ED1E6ED61B00E2EA33 /* TopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610801EC1E6ED61B00E2EA33 /* TopicCell.swift */; };
+		610801F01E6ED70400E2EA33 /* FilterHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610801EF1E6ED70400E2EA33 /* FilterHeader.swift */; };
+		610801F21E6F130400E2EA33 /* RecordingDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610801F11E6F130400E2EA33 /* RecordingDetailViewController.swift */; };
 		61806B461E6D475000DFF905 /* UsefulExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61806B451E6D475000DFF905 /* UsefulExtension.swift */; };
 		61806B481E6D4A1800DFF905 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 61806B471E6D4A1800DFF905 /* Assets.xcassets */; };
 		61806B4B1E6D56D400DFF905 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61806B4A1E6D56D400DFF905 /* User.swift */; };
@@ -22,6 +26,10 @@
 
 /* Begin PBXFileReference section */
 		56D5BBD5D0632D2677265481 /* Pods-EnglishGuess.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EnglishGuess.release.xcconfig"; path = "Pods/Target Support Files/Pods-EnglishGuess/Pods-EnglishGuess.release.xcconfig"; sourceTree = "<group>"; };
+		610801EA1E6E9DF300E2EA33 /* Recording.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Recording.swift; sourceTree = "<group>"; };
+		610801EC1E6ED61B00E2EA33 /* TopicCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopicCell.swift; sourceTree = "<group>"; };
+		610801EF1E6ED70400E2EA33 /* FilterHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterHeader.swift; sourceTree = "<group>"; };
+		610801F11E6F130400E2EA33 /* RecordingDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordingDetailViewController.swift; sourceTree = "<group>"; };
 		61806B451E6D475000DFF905 /* UsefulExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsefulExtension.swift; sourceTree = "<group>"; };
 		61806B471E6D4A1800DFF905 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		61806B4A1E6D56D400DFF905 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -51,12 +59,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		610801EE1E6ED62200E2EA33 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				610801EC1E6ED61B00E2EA33 /* TopicCell.swift */,
+				610801EF1E6ED70400E2EA33 /* FilterHeader.swift */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
 		61806B491E6D56BB00DFF905 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
 				61E9A17B1E6D252200194D01 /* HomeViewController.swift */,
 				61806B4D1E6DC21600DFF905 /* RecordViewController.swift */,
 				61806B4F1E6DC29A00DFF905 /* QuestionViewController.swift */,
+				610801F11E6F130400E2EA33 /* RecordingDetailViewController.swift */,
 				61E9A18D1E6D2D6E00194D01 /* LoginViewController.swift */,
 			);
 			name = ViewController;
@@ -66,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				61806B4A1E6D56D400DFF905 /* User.swift */,
+				610801EA1E6E9DF300E2EA33 /* Recording.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -95,6 +114,7 @@
 				61E9A1791E6D252200194D01 /* AppDelegate.swift */,
 				61806B491E6D56BB00DFF905 /* ViewController */,
 				61806B4C1E6D56D900DFF905 /* Model */,
+				610801EE1E6ED62200E2EA33 /* View */,
 				61E9A1821E6D252200194D01 /* LaunchScreen.storyboard */,
 				61806B471E6D4A1800DFF905 /* Assets.xcassets */,
 				61806B451E6D475000DFF905 /* UsefulExtension.swift */,
@@ -252,10 +272,14 @@
 			files = (
 				61E9A18E1E6D2D6E00194D01 /* LoginViewController.swift in Sources */,
 				61806B461E6D475000DFF905 /* UsefulExtension.swift in Sources */,
+				610801F01E6ED70400E2EA33 /* FilterHeader.swift in Sources */,
+				610801F21E6F130400E2EA33 /* RecordingDetailViewController.swift in Sources */,
 				61806B501E6DC29A00DFF905 /* QuestionViewController.swift in Sources */,
 				61E9A17C1E6D252200194D01 /* HomeViewController.swift in Sources */,
 				61806B4B1E6D56D400DFF905 /* User.swift in Sources */,
 				61E9A17A1E6D252200194D01 /* AppDelegate.swift in Sources */,
+				610801EB1E6E9DF300E2EA33 /* Recording.swift in Sources */,
+				610801ED1E6ED61B00E2EA33 /* TopicCell.swift in Sources */,
 				61806B4E1E6DC21600DFF905 /* RecordViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

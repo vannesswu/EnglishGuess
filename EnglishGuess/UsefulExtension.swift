@@ -86,6 +86,9 @@ extension UIColor {
     static let buyRed = {
         return UIColor(r: 247, g: 70, b: 77)
     }()
+    static let titleViewCyan = {
+        return UIColor(r: 117, g: 232, b: 206)
+    }()
     
 }
 

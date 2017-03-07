@@ -12,7 +12,7 @@ import LBTAComponents
 
 class HomeViewController: UIViewController {
 
-    
+    var user:User!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,21 +29,10 @@ class HomeViewController: UIViewController {
 
     override func viewWillLayoutSubviews() {
         setupStatusView()
-        setuCategoryView()
+        setupCategoryView()
+        setupTitleImageView()
     }
     
-//    let todayCompletedQuestionLabel:UILabel = {
-//        let label1 = UILabel()
-//        label1.textAlignment = .center
-//        label1.textColor = UIColor.white
-//        return label1
-//    }()
-//    let uploadQuestionLabel:UILabel = {
-//        let label = UILabel()
-//        label.textAlignment = .center
-//        label.textColor = UIColor.white
-//        return label
-//    }()
     
     lazy var questionSegmentedControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["我要練聽力", "我要練口說"])
@@ -98,13 +87,14 @@ class HomeViewController: UIViewController {
     
     func handleCatButtonPress(_ sender:UIButton){
         
-        if questionSegmentedControl.selectedSegmentIndex == 0 {
+        if questionSegmentedControl.selectedSegmentIndex == 1 {
             let recordViewController = RecordViewController()
             recordViewController.category = sender.currentTitle
+            recordViewController.user = user
             navigationController?.pushViewController(recordViewController, animated: true)
         } else {
             let questionViewController = QuestionViewController()
-            questionViewController.category = sender.currentTitle
+            questionViewController.category = sender.currentTitle!
             navigationController?.pushViewController(questionViewController, animated: true)
             
             
@@ -112,7 +102,7 @@ class HomeViewController: UIViewController {
         
     }
     
-    func setuCategoryView() {
+    func setupCategoryView() {
         let categoryView = UIView()
         view.addSubview(categoryView)
         categoryView.anchor(statusView.bottomAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 0)
@@ -134,6 +124,19 @@ class HomeViewController: UIViewController {
         cat6Button.anchor(cat4Button.bottomAnchor, left: cat4Button.leftAnchor, bottom: nil, right: cat4Button.rightAnchor, topConstant: 12, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 80)
         
     }
+    
+    
+    func setupTitleImageView() {
+        
+        let titleImageView = UIImageView()
+        titleImageView.image = #imageLiteral(resourceName: "英文猜猜樂").withRenderingMode(.alwaysTemplate)
+        titleImageView.tintColor = UIColor.titleViewCyan
+        titleImageView.contentMode = .scaleAspectFill
+        view.addSubview(titleImageView)
+        titleImageView.anchor(statusView.bottomAnchor, left: view.leftAnchor, bottom: cat1Button.topAnchor, right: view.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        
+    }
+    
 
     func checkIfUserIsLoggedIn() {
         if FIRAuth.auth()?.currentUser?.uid == nil {
@@ -151,8 +154,8 @@ class HomeViewController: UIViewController {
         FIRDatabase.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
             
             if let dictionary = snapshot.value as? [String: AnyObject] {
-            let user = User(dictionary:dictionary)
-                self.setupNavBarTitle(user)
+                self.user = User(dictionary:dictionary)
+                self.setupNavBarTitle(self.user)
             }
             
         }, withCancel: nil)

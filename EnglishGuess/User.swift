@@ -13,6 +13,7 @@ class User : NSObject {
     var name:String?
     var email:String?
     var profileImageUrl:String?
+    var recordings:[Recording]?
     
     init (dictionary: [String:AnyObject]) {
         
@@ -20,6 +21,7 @@ class User : NSObject {
         self.name = dictionary["name"] as? String
         self.email = dictionary["email"] as? String
         self.profileImageUrl = dictionary["profileImageUrl"] as? String
+        self.recordings = dictionary["recordings"] as? [Recording]
         
         
     }
