@@ -64,7 +64,6 @@ class RecordingDetailViewController:UIViewController {
             isNeedAddHeight = false
         }
     }
-    
     lazy var PlayButton:UIButton = {
         let btn = UIButton()
         btn.setImage(#imageLiteral(resourceName: "play"), for: .normal)
