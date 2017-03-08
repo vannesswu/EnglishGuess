@@ -35,7 +35,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     lazy var loginRegisterButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(r: 80, g: 101, b: 161)
+        button.backgroundColor = UIColor.blue
         button.setTitle("註冊", for: UIControlState())
         button.setTitleColor(UIColor.white, for: UIControlState())
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
@@ -78,6 +78,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             print("Form is not valid")
             return
         }
+        handleUserLogin()
         FIRAuth.auth()?.signIn(withEmail: email, password: password, completion: { (user, error) in
             
             if error != nil {
@@ -88,7 +89,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             //successfully logged in our user
             
        //     self.messagesController?.fetchUserAndSetupNavBarTitle()
-            
+            self.transitionAnimate()
             self.dismiss(animated: true, completion: nil)
             
         })
@@ -100,19 +101,14 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             print("Form is not valid")
             return
         }
-        
-        
-        
-        
-        
-        
+
         FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user: FIRUser?, error) in
             
             if error != nil {
                 print(error ?? "")
                 return
             }
-            
+            self.handleUserLogin()
             self.handleProfileImage(registerMethod.email)
        })
     }
@@ -122,6 +118,8 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         guard let uid = FIRAuth.auth()?.currentUser?.uid else {
             return
         }
+        
+        
         var email:String = ""
         var name:String = ""
         
@@ -177,18 +175,56 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         
         usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
             if err != nil {
-                print(err)
+                print(err ?? "")
                 return
             }
             let user = User(dictionary: values )
             
             self.homeViewController?.setupNavBarTitle(user)
+            self.transitionAnimate()
             self.dismiss(animated: true, completion: nil)
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+//            self.transitionAnimate()
+//            }
         })
     }
+    
+    let blackView = UIView()
+    let spinner = UIActivityIndicatorView()
+    let handlingLabel = UILabel()
+    func handleUserLogin() {
+        
+        if let window = UIApplication.shared.keyWindow {
+            
+            window.addSubview(blackView)
+            blackView.fillSuperview()
+            blackView.backgroundColor = UIColor.mainBlue
+            blackView.addSubview(spinner)
+            blackView.addSubview(handlingLabel)
+            handlingLabel.anchorCenterSuperview()
+            spinner.anchorCenterYToSuperview()
+            spinner.activityIndicatorViewStyle = .gray
+            spinner.anchor(nil, left: handlingLabel.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 50, heightConstant: 50)
+            //   handlingLabel.backgroundColor = UIColor.white
+            handlingLabel.font = UIFont.systemFont(ofSize: 25)
+            handlingLabel.text = "用戶登入中請稍候"
+            handlingLabel.textColor = UIColor.white
+            spinner.startAnimating()
+        }
+    }
+    func transitionAnimate() {
+       
+        if let window = UIApplication.shared.keyWindow {
+        
+         UIView.animate(withDuration: 0.5, animations: {
+            self.blackView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: window.frame.height)
+         }, completion: { (_) in
+            self.blackView.removeFromSuperview()
 
-    
-    
+         })
+            
+      }
+    }
     lazy var profileImageView:CachedImageView = {
         let iv = CachedImageView()
         iv.image = UIImage(named: "defaultprofile")
@@ -253,7 +289,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.adoptGreen
+        view.backgroundColor = UIColor.darkGreen
     
     }
     
@@ -285,13 +321,13 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         inputsContainerView.anchorCenterSuperview()
         inputsContainerView.anchor(nil, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 300, heightConstant: 150)
         inputsContainerView.addSubview(nameTextField)
-        nameTextField.addSubview(nameSeparatorView)
+        emailTextField.addSubview(nameSeparatorView)
         inputsContainerView.addSubview(emailTextField)
         emailTextField.addSubview(emailSeparatorView)
         inputsContainerView.addSubview(passwordTextField)
         
         nameTextField.anchor(inputsContainerView.topAnchor, left: inputsContainerView.leftAnchor, bottom: nil, right: inputsContainerView.rightAnchor, topConstant: 0, leftConstant: 12, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
-        nameSeparatorView.anchor(nil, left: inputsContainerView.leftAnchor, bottom: nameTextField.bottomAnchor, right: inputsContainerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
+        nameSeparatorView.anchor(emailTextField.topAnchor, left: inputsContainerView.leftAnchor, bottom: nil, right: inputsContainerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         
         emailTextField.anchor(nameTextField.bottomAnchor, left: nameTextField.leftAnchor, bottom: nil, right: nameTextField.rightAnchor , topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
         emailSeparatorView.anchor(nil, left: inputsContainerView.leftAnchor, bottom: emailTextField.bottomAnchor, right: inputsContainerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
@@ -340,15 +376,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     var fbUserDict:[String:AnyObject]?
     func handleFBLogin() {
-  //      let accessToken = FBSDKAccessToken.current()
-        
-//        FBSDKLoginManager().logIn(withReadPermissions: ["email","public_profile"], from: self) { (result, err) in
-//            if err != nil {
-//                print("Custom FB Login failed:", err)
-//                return
-//            }
-//        }
-
+  
         let credential = FIRFacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
         
         FIRAuth.auth()?.signIn(with: credential, completion: { (user, error) in
@@ -356,28 +384,28 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
                 print("Something went wrong with our FB user: ", error ?? "")
                 return
             }
-            
+            self.handleUserLogin()
             print("Successfully logged in with our user: ", user ?? "")
+            
+            FBSDKGraphRequest(graphPath: "/me", parameters: ["fields": "id, name, email"]).start { (connection, result, err) in
+                
+                if err != nil {
+                    print("Failed to start graph request:", err ?? "")
+                    return
+                }
+                print(result ?? "")
+                
+                self.fbUserDict = result as? [String:AnyObject]
+                if let fid = self.fbUserDict?["id"] as? String {
+                    let urlString = "http://graph.facebook.com/\(fid)/picture?type=large"
+                    self.profileImageView.loadImage(urlString: urlString, completion: {
+                        self.handleProfileImage(.fb)
+                    })
+                }
+            }
         })
         
-        FBSDKGraphRequest(graphPath: "/me", parameters: ["fields": "id, name, email"]).start { (connection, result, err) in
-            
-            if err != nil {
-                print("Failed to start graph request:", err ?? "")
-                return
-            }
-            print(result ?? "")
-            // var imgURLString = "http://graph.facebook.com/" + fid! + "/picture?type=large"
-            self.fbUserDict = result as? [String:AnyObject]
-            if let fid = self.fbUserDict?["id"] as? String {
-            let urlString = "http://graph.facebook.com/\(fid)/picture?type=large"
-            self.profileImageView.loadImage(urlString: urlString, completion: {
-                self.handleProfileImage(.fb)
-            })
-            
-            
-            }
-        }
+
     }
     
     

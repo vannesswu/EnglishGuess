@@ -8,6 +8,7 @@
 
 import Foundation
 import LBTAComponents
+import Firebase
 
 extension String {
     func index(from: Int) -> Index {
@@ -88,6 +89,9 @@ extension UIColor {
     }()
     static let titleViewCyan = {
         return UIColor(r: 117, g: 232, b: 206)
+    }()
+    static let darkGreen = {
+        return UIColor(r: 18, g: 110, b: 131)
     }()
     
 }
@@ -194,7 +198,32 @@ extension UserDefaults {
         }
         return 0
     }
+    static func numberOfQInToday() -> Int {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return 0}
+        if let number = UserDefaults.standard.object(forKey: uid + Date.returnTodayString()) as? Int {
+            return number
+        }
+        return 0
+    }
+    static func numberOfUpload() -> Int {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return 0}
+        if let number = UserDefaults.standard.object(forKey: "\(uid)EnglishGuessUpload") as? Int {
+            return number
+        }
+        return 0
+    }
     
+}
+
+extension Date {
+    
+    static func returnTodayString() -> String {
+    let date = Date()
+    let formater = DateFormatter()
+    formater.dateStyle = .short
+    return formater.string(from: date)
+    
+    }
 }
 
 

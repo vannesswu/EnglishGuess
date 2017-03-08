@@ -13,24 +13,53 @@ import LBTAComponents
 class HomeViewController: UIViewController {
 
     var user:User!
+    lazy var menuLauncher: MenuLauncher = {
+        let launcher = MenuLauncher()
+        return launcher
+    }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.white
+        
+        setupBarButton()
+        checkIfUserIsLoggedIn()
+    }
+    
+    func setupBarButton() {
         UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName:UIColor.white]
         navigationController?.navigationBar.isTranslucent = false
         let backBarButtonItem = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: nil, action: nil)
         backBarButtonItem.setTitleTextAttributes([NSForegroundColorAttributeName:UIColor.white], for: .normal)
         self.navigationController?.navigationBar.tintColor = UIColor.white
-        
         navigationItem.backBarButtonItem = backBarButtonItem
-        checkIfUserIsLoggedIn()
+        
+        
+        let settingImage = UIImage(named: "settings")?.withRenderingMode(.alwaysOriginal)
+        let searchBarButtonItem = UIBarButtonItem(image: settingImage, style: .plain, target: self, action: #selector(handleSetting))
+        navigationItem.rightBarButtonItems = [searchBarButtonItem]
+        
     }
-
+    
+    func handleSetting() {
+        menuLauncher.homeViewController = self
+        menuLauncher.showMenuLauncher()
+    }
     override func viewWillLayoutSubviews() {
         setupStatusView()
         setupCategoryView()
         setupTitleImageView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        updateLabelCount()
+    }
+    
+    func updateLabelCount() {
+        todayCompletedQuestionLabel.text = "今日已答題數:\(UserDefaults.numberOfQInToday())/10"
+        uploadQuestionLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
+        
     }
     
     
@@ -45,22 +74,21 @@ class HomeViewController: UIViewController {
     var CompletedQuestions = 0
     var uploadQuestions = 0
     let statusView = UIView()
+    
+    let todayCompletedQuestionLabel:UILabel = {
+        let label1 = UILabel()
+        label1.textAlignment = .center
+        label1.textColor = UIColor.white
+        return label1
+    }()
+    let uploadQuestionLabel:UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.textColor = UIColor.white
+        return label
+    }()
+    
     func setupStatusView() {
-        
-        let todayCompletedQuestionLabel:UILabel = {
-            let label1 = UILabel()
-            label1.textAlignment = .center
-            label1.textColor = UIColor.white
-            return label1
-        }()
-        let uploadQuestionLabel:UILabel = {
-            let label = UILabel()
-            label.textAlignment = .center
-            label.textColor = UIColor.white
-            return label
-        }()
-
-        
         
         statusView.backgroundColor = UIColor.mainBlue
         view.addSubview(statusView)
@@ -70,8 +98,8 @@ class HomeViewController: UIViewController {
         todayCompletedQuestionLabel.anchor(statusView.topAnchor, left: statusView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: view.frame.size.width/2, heightConstant: 50)
         uploadQuestionLabel.anchor(todayCompletedQuestionLabel.topAnchor, left: todayCompletedQuestionLabel.rightAnchor, bottom: nil, right: statusView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
         
-        todayCompletedQuestionLabel.text = "今日已答題數:\(CompletedQuestions)/10"
-        uploadQuestionLabel.text = "已上傳題數:\(uploadQuestions)/10"
+//        todayCompletedQuestionLabel.text = "今日已答題數:\(CompletedQuestions)/10"
+//        uploadQuestionLabel.text = "已上傳題數:\(uploadQuestions)/10"
         
         statusView.addSubview(questionSegmentedControl)
         questionSegmentedControl.anchor(todayCompletedQuestionLabel.bottomAnchor, left: statusView.leftAnchor, bottom: statusView.bottomAnchor, right: statusView.rightAnchor, topConstant: 15, leftConstant: 50, bottomConstant: 5, rightConstant: 50, widthConstant: 0, heightConstant: 0)
@@ -142,6 +170,7 @@ class HomeViewController: UIViewController {
         if FIRAuth.auth()?.currentUser?.uid == nil {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
+            
             fetchUserAndSetupNavBarTitle()
         }
     }
@@ -156,7 +185,11 @@ class HomeViewController: UIViewController {
             if let dictionary = snapshot.value as? [String: AnyObject] {
                 self.user = User(dictionary:dictionary)
                 self.setupNavBarTitle(self.user)
+                
             }
+            let numberOfUpload = self.user.recordings?.count ?? 0
+            UserDefaults.standard.set(numberOfUpload, forKey: uid+"EnglishGuessUpload")
+            self.updateLabelCount()
             
         }, withCancel: nil)
     }
@@ -165,6 +198,7 @@ class HomeViewController: UIViewController {
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
         //        titleView.backgroundColor = UIColor.redColor()
+        
         
         let containerView = UIView()
         titleView.addSubview(containerView)

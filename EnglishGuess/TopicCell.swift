@@ -15,7 +15,9 @@ class TopicCell: UITableViewCell {
         
         didSet {
             if let url = recording?.profileImageUrl {
-            self.profileImageView.loadImage(urlString: url)
+            self.profileImageView.loadImage(urlString: url, completion: {
+                self.spinner.stopAnimating()
+            })
             }
             self.nameLabel.text = recording?.userName ?? ""
             self.likeLabel.text = "\(recording?.likes ?? 0)"
@@ -37,7 +39,7 @@ class TopicCell: UITableViewCell {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+    let spinner = UIActivityIndicatorView.spinner
     let profileImageView: CachedImageView = {
         let iv = CachedImageView()
         iv.contentMode = .scaleAspectFill
@@ -85,6 +87,9 @@ class TopicCell: UITableViewCell {
         addSubview(dislikeImageView)
         addSubview(timeStampLabel)
         profileImageView.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: 60, heightConstant: 0)
+        profileImageView.addSubview(spinner)
+        spinner.anchorCenterSuperview()
+        spinner.startAnimating()
         nameLabel.anchor(profileImageView.topAnchor, left: profileImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 0)
         likeImageView.anchor(nil, left: nameLabel.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
         likeImageView.anchorCenterYToSuperview()

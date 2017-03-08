@@ -16,6 +16,13 @@ class RecordViewController : UIViewController {
     
     var category:String?
     var user:User!
+    var numberOfUpload = {
+        return UserDefaults.numberOfUpload()
+        }(){
+        didSet {
+            numberOfQLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         recordingSession = AVAudioSession.sharedInstance()
@@ -35,9 +42,9 @@ class RecordViewController : UIViewController {
             // failed to record!
         }
         view.backgroundColor = UIColor.white
-        navigationItem.title = category ?? ""
     }
     override func viewWillLayoutSubviews() {
+        setupTitleView()
         setupTopicView()
         setupRecordButtonView()
         setupHintView()
@@ -54,6 +61,18 @@ class RecordViewController : UIViewController {
         label.numberOfLines = 0
         return label
     }()
+    let titleView = UIView()
+    let numberOfQLabel = UILabel()
+    
+    
+    func setupTitleView(){
+        navigationItem.titleView = titleView
+        numberOfQLabel.textColor = UIColor.white
+        titleView.addSubview(numberOfQLabel)
+        numberOfQLabel.anchorCenterSuperview()
+        numberOfQLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
+    }
+    
     func setupTopicView() {
        view.addSubview(topicLabel)
        topicLabel.anchor(view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: view.frame.size.height/4)
@@ -208,7 +227,7 @@ class RecordViewController : UIViewController {
              
                 let value = ["recordingID":self.uuid]
                 self.updateUserRecordings(uid, values: value as [String : AnyObject])
-                let recordValue = ["userName":self.user.name as AnyObject, "profileImageUrl":self.user.profileImageUrl as AnyObject, "category":self.category as AnyObject,"recordingUrl":recordingUrl as AnyObject,"timeStamp":timeStamp as AnyObject,"answer":"吊橋" as AnyObject]
+                let recordValue = ["id":self.uuid as AnyObject, "userName":self.user.name as AnyObject, "profileImageUrl":self.user.profileImageUrl as AnyObject, "category":self.category as AnyObject,"recordingUrl":recordingUrl as AnyObject,"timeStamp":timeStamp as AnyObject,"chAnswer":"吊橋" as AnyObject,"engAnswer":"suspension bridge" as AnyObject]
                 self.uploadUserRecordings(values: recordValue as [String : AnyObject])
 
                 
@@ -239,6 +258,10 @@ class RecordViewController : UIViewController {
                 print(err)
                 return
             }
+            guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
+            self.numberOfUpload += 1
+            UserDefaults.standard.set(self.numberOfUpload, forKey: "\(uid)EnglishGuessUpload")
+            
             self.blackView.removeFromSuperview()
             self.uploadButton.isEnabled = false
             self.uploadButton.alpha = 0.5
