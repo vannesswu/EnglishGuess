@@ -11,6 +11,7 @@ import Firebase
 
 class Recording : NSObject {
     
+    var category:String?
     var id:String?
     var userName :String?
     var timeStamp:Int?
@@ -25,6 +26,7 @@ class Recording : NSObject {
     var correctRate:Double? = 0.0
     
     init (dictionary: [String:AnyObject]) {
+        self.category = dictionary["category"]  as? String
         self.id = dictionary["id"]  as? String
         self.userName = dictionary["userName"]  as? String
         self.chAnswer = dictionary["chAnswer"]  as? String
@@ -36,7 +38,7 @@ class Recording : NSObject {
         self.profileImageUrl = dictionary["profileImageUrl"] as? String
         self.totalClick = dictionary["totalClick"] as? Int ?? 0
         self.correct = dictionary["correct"] as? Int ?? 0
-        
+        self.correctRate = dictionary["correctRate"] as? Double ?? 0.0
     }
     func returnRecordingDict() -> [String:AnyObject] {
         

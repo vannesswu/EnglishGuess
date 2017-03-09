@@ -9,7 +9,7 @@
 import Foundation
 import LBTAComponents
 import Firebase
-
+import AVFoundation
 
 class QuestionViewController: UITableViewController {
     
@@ -18,6 +18,7 @@ class QuestionViewController: UITableViewController {
     var category:String = ""
     var recordingDict = [String:AnyObject]()
     var recordings = [Recording]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitleView()

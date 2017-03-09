@@ -254,11 +254,14 @@ extension UIButton {
 
         let btn = UIButton()
         btn.setTitle(title, for: .normal)
-        btn.layer.cornerRadius = 15
-        btn.clipsToBounds = true
         btn.addTarget(HomeViewController(), action: #selector(HomeViewController.handleCatButtonPress), for: .touchUpInside)
         btn.setTitleColor(UIColor.white, for: .normal)
         btn.backgroundColor = UIColor.adoptRed
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: -2, height: 2)
+        btn.layer.shadowOpacity = 0.8
+        btn.layer.shadowRadius = 2.0
+
         return btn
     }
 

@@ -223,14 +223,13 @@ class RecordViewController : UIViewController {
                 return
             }
             
-            if let recordingUrl = metadata?.downloadURL()?.absoluteString {
+            if let recordingUrl = metadata?.downloadURL()?.absoluteString,let category = self.category {
              
-                let value = ["recordingID":self.uuid]
+                let value = [self.uuid : category]
                 self.updateUserRecordings(uid, values: value as [String : AnyObject])
                 let recordValue = ["id":self.uuid as AnyObject, "userName":self.user.name as AnyObject, "profileImageUrl":self.user.profileImageUrl as AnyObject, "category":self.category as AnyObject,"recordingUrl":recordingUrl as AnyObject,"timeStamp":timeStamp as AnyObject,"chAnswer":"吊橋" as AnyObject,"engAnswer":"suspension bridge" as AnyObject]
                 self.uploadUserRecordings(values: recordValue as [String : AnyObject])
 
-                
             }
          })
         }
@@ -238,7 +237,7 @@ class RecordViewController : UIViewController {
     
     fileprivate func updateUserRecordings(_ uid: String, values: [String: AnyObject]) {
         let ref = FIRDatabase.database().reference()
-        let usersReference = ref.child("users").child(uid).child("recordings").childByAutoId()
+        let usersReference = ref.child("users").child(uid).child("recordings")
         
         usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
             if err != nil {

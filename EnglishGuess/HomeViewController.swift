@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 import LBTAComponents
-
+import StoreKit
 class HomeViewController: UIViewController {
 
     var user:User!
@@ -18,6 +18,7 @@ class HomeViewController: UIViewController {
         return launcher
     }()
     
+    var products = [SKProduct]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,8 +41,19 @@ class HomeViewController: UIViewController {
         let searchBarButtonItem = UIBarButtonItem(image: settingImage, style: .plain, target: self, action: #selector(handleSetting))
         navigationItem.rightBarButtonItems = [searchBarButtonItem]
         
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(HomeViewController.handlePurchaseNotification),
+            name: NSNotification.Name(rawValue: IAPHelper.IAPHelperPurchaseNotification),object: nil)
+
     }
-    
+    func handlePurchaseNotification(_ notification: Notification) {
+        guard let productID = notification.object as? String else { return }
+        
+        for (_, product) in products.enumerated() {
+            guard product.productIdentifier == productID else { continue }
+            
+        }
+    }
     func handleSetting() {
         menuLauncher.homeViewController = self
         menuLauncher.showMenuLauncher()
@@ -54,7 +66,18 @@ class HomeViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         updateLabelCount()
+        checkVIP()
     }
+    
+    func checkVIP(){
+        products = []
+        EnglishGuessVIP.store.requestProducts{success, products in
+            if success {
+                self.products = products!
+            }
+        }
+    }
+    
     
     func updateLabelCount() {
         todayCompletedQuestionLabel.text = "今日已答題數:\(UserDefaults.numberOfQInToday())/10"
@@ -247,7 +270,12 @@ class HomeViewController: UIViewController {
             print ("here")
         }
     }
-
+   
+    func showUserUploadFiles() {
+        let userFilesVC = UserFilesViewController()
+        navigationController?.pushViewController(userFilesVC, animated: true)
+        
+    }
 
 }
 
