@@ -426,6 +426,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		</dict>
 		<dict>
 			<key>FooterText</key>
+			<string>Copyright 2016 Google Inc.</string>
+			<key>License</key>
+			<string>Apache 2.0</string>
+			<key>Title</key>
+			<string>GoogleMobileAdsMediationUnity</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>See http://www.apache.org/licenses/LICENSE-2.0.html</string>
+			<key>License</key>
+			<string>Apache 2.0</string>
+			<key>Title</key>
+			<string>GoogleMobileAdsMediationUnityAdsSDK</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
 			<string>
                                  Apache License
                            Version 2.0, January 2004

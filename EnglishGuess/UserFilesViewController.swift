@@ -42,18 +42,12 @@ class UserFilesViewController : UITableViewController {
     }
     
     let titleView = UIView()
-    let numberOfQLabel = UILabel()
+    let numberOfQLabel = UploadQuestionLabel()
     
     func setupTitleView(){
         navigationItem.titleView = titleView
-        numberOfQLabel.textColor = UIColor.white
         titleView.addSubview(numberOfQLabel)
         numberOfQLabel.anchorCenterSuperview()
-        numberOfQLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
-    }
-    func updateLabel() {
-        numberOfQLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
-        
     }
     
     func fetchUseruploadIDs() {
@@ -202,7 +196,7 @@ class UserFilesViewController : UITableViewController {
             })
             let numberOfUpload = UserDefaults.numberOfUpload() - 1
             UserDefaults.standard.set(numberOfUpload, forKey: uid+"EnglishGuessUpload")
-            updateLabel()
+            numberOfQLabel.update()
         }
      }
     }

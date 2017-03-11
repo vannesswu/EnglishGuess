@@ -335,6 +335,14 @@ Copyright 2017 Google
 
 Copyright 2017 Google
 
+## GoogleMobileAdsMediationUnity
+
+Copyright 2016 Google Inc.
+
+## GoogleMobileAdsMediationUnityAdsSDK
+
+See http://www.apache.org/licenses/LICENSE-2.0.html
+
 ## GoogleToolboxForMac
 
 

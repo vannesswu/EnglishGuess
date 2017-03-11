@@ -18,11 +18,9 @@ class RecordViewController : UIViewController {
     var user:User!
     var numberOfUpload = {
         return UserDefaults.numberOfUpload()
-        }(){
-        didSet {
-            numberOfQLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
-        }
-    }
+        }()
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         recordingSession = AVAudioSession.sharedInstance()
@@ -42,6 +40,10 @@ class RecordViewController : UIViewController {
             // failed to record!
         }
         view.backgroundColor = UIColor.white
+        let changeTopicBarButtonItem = UIBarButtonItem(title: "換一題", style: .plain, target: self, action: #selector(chooseRandomTopic))
+        navigationItem.rightBarButtonItems = [changeTopicBarButtonItem]
+        
+        
     }
     override func viewWillLayoutSubviews() {
         setupTitleView()
@@ -56,27 +58,39 @@ class RecordViewController : UIViewController {
         label.textAlignment = .center
         label.textColor = UIColor.darkText
         label.font = UIFont.boldSystemFont(ofSize: 40)
-        label.adjustsFontForContentSizeCategory = true
+        label.adjustsFontSizeToFitWidth = true
         label.backgroundColor = UIColor.lightGray
         label.numberOfLines = 0
         return label
     }()
     let titleView = UIView()
-    let numberOfQLabel = UILabel()
+    let numberOfQLabel = UploadQuestionLabel()
     
     
     func setupTitleView(){
         navigationItem.titleView = titleView
-        numberOfQLabel.textColor = UIColor.white
         titleView.addSubview(numberOfQLabel)
         numberOfQLabel.anchorCenterSuperview()
-        numberOfQLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
     }
     
     func setupTopicView() {
        view.addSubview(topicLabel)
        topicLabel.anchor(view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: view.frame.size.height/4)
-        topicLabel.text = "題目為:吊橋\n suspension bridge"
+    }
+    var chineseTopic = ""
+    var engTopic = ""
+    var chineseTopicAry = [String]() {
+        didSet {
+            chooseRandomTopic()
+        }
+    }
+    var engTopicAry = [String]()
+    func chooseRandomTopic() {
+        let randomIndex = Int(arc4random_uniform(UInt32(chineseTopicAry.count)))
+        chineseTopic = chineseTopicAry[randomIndex]
+        engTopic = engTopicAry[randomIndex]
+        topicLabel.text = "題目為:\(chineseTopic)\n\(engTopic)"
+        
     }
     
     let timerLabel:UILabel = {
@@ -160,12 +174,16 @@ class RecordViewController : UIViewController {
     var uuid = ""
     
     func startRecording() {
-        uuid = UUID().uuidString
+        if !checkUserQuota() { return }
+        
+        let preuuid = UUID().uuidString
+        let timeStamp = Int(Date().timeIntervalSince1970)
+        uuid = "\(timeStamp)\(preuuid)"
         audioFilename = getDocumentsDirectory().appendingPathComponent("\(uuid).m4a")
         
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
+            AVSampleRateKey: 8000,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.low.rawValue,
             ]
@@ -181,15 +199,35 @@ class RecordViewController : UIViewController {
      startTimer()
     }
     
+    func checkUserQuota() -> Bool {
+        if UserDefaults.numberOfUpload() < UserDefaults.userUploadQuota() {
+            return true
+        } else {
+            let alertController = UIAlertController(title: "上傳額度已滿", message: "請升級至VIP或刪除先前上傳檔案", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alertController.addAction(okAction)
+            self.present(alertController, animated: true, completion: nil)
+            return false
+        }
+        
+    }
+    
+    
     func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         let documentsDirectory = paths[0]
         return documentsDirectory
     }
-    
+    var timer: CADisplayLink?
     func startTimer() {
         countdownTime = 15.0
-        countdowntimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(countdownTimer), userInfo: nil, repeats: true)
+   //     countdowntimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(countdownTimer), userInfo: nil, repeats: true)
+        
+        timer = CADisplayLink(target: self, selector: #selector(countdownTimer))
+        timer?.add(to: .main, forMode: .defaultRunLoopMode)
+        timer?.add(to: .main, forMode: .UITrackingRunLoopMode)
+        timer?.frameInterval = 6
+        
         buttonEnable(false)
   
         
@@ -201,6 +239,8 @@ class RecordViewController : UIViewController {
           self.timerLabel.text = "\(self.numberFormatter.string(from: NSNumber(value: self.countdownTime))!)"
             if ( self.timerLabel.text == "0.0"){
                 self.countdowntimer.invalidate()
+                self.timer?.invalidate()
+                self.timer = nil
                 self.buttonEnable(true)
                 self.audioRecorder.stop()
         }
@@ -227,9 +267,11 @@ class RecordViewController : UIViewController {
              
                 let value = [self.uuid : category]
                 self.updateUserRecordings(uid, values: value as [String : AnyObject])
-                let recordValue = ["id":self.uuid as AnyObject, "userName":self.user.name as AnyObject, "profileImageUrl":self.user.profileImageUrl as AnyObject, "category":self.category as AnyObject,"recordingUrl":recordingUrl as AnyObject,"timeStamp":timeStamp as AnyObject,"chAnswer":"吊橋" as AnyObject,"engAnswer":"suspension bridge" as AnyObject]
+                let recordValue = ["id":self.uuid as AnyObject, "userName":self.user.name as AnyObject, "profileImageUrl":self.user.profileImageUrl as AnyObject, "category":self.category as AnyObject,"recordingUrl":recordingUrl as AnyObject,"timeStamp":timeStamp as AnyObject,"chAnswer":self.chineseTopic as AnyObject,"engAnswer":self.engTopic as AnyObject]
                 self.uploadUserRecordings(values: recordValue as [String : AnyObject])
-
+                if let filepath = self.audioFilename {
+                _ = try? FileManager.default.removeItem(at: filepath)
+                }
             }
          })
         }
@@ -241,7 +283,7 @@ class RecordViewController : UIViewController {
         
         usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
             if err != nil {
-                print(err)
+                print(err ?? "")
                 return
             }
             print("here")
@@ -260,7 +302,7 @@ class RecordViewController : UIViewController {
             guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
             self.numberOfUpload += 1
             UserDefaults.standard.set(self.numberOfUpload, forKey: "\(uid)EnglishGuessUpload")
-            
+            self.numberOfQLabel.update()
             self.blackView.removeFromSuperview()
             self.uploadButton.isEnabled = false
             self.uploadButton.alpha = 0.5
@@ -356,26 +398,25 @@ extension RecordViewController: AVAudioRecorderDelegate ,AVAudioPlayerDelegate {
         audioRecorder.stop()
         audioRecorder = nil
         
-        if success {
-            
-            let filePath = audioFilename?.path
-            var fileSize : UInt64
-            
-            do {
-                //return [FileAttributeKey : Any]
-                let fileAttributes = try FileManager.default.attributesOfItem(atPath: filePath!)
-                let fileSizeNumber = fileAttributes[FileAttributeKey.size] as! NSNumber
-                let fileSize = fileSizeNumber.int64Value
-                var sizeMB = Double(fileSize / 1024)
-                sizeMB = Double(sizeMB / 1024)
-                print(String(format: "%.2f", sizeMB) + " MB")
-            } catch {
-                print("Error: \(error)")
-            }
-            
-        } else {
-            
-            // recording failed :(
-        }
+//        if success {
+//            
+//            let filePath = audioFilename?.path
+//            var fileSize : UInt64
+//            do {
+//                //return [FileAttributeKey : Any]
+//                let fileAttributes = try FileManager.default.attributesOfItem(atPath: filePath!)
+//                let fileSizeNumber = fileAttributes[FileAttributeKey.size] as! NSNumber
+//                let fileSize = fileSizeNumber.int64Value
+//                var sizeMB = Double(fileSize / 1024)
+//                sizeMB = Double(sizeMB / 1024)
+//                print(String(format: "%.2f", sizeMB) + " MB")
+//            } catch {
+//                print("Error: \(error)")
+//            }
+//            
+//        } else {
+//            
+//            // recording failed :(
+//        }
     }
 }

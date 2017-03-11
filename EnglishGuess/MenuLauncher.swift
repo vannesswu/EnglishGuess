@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 import LBTAComponents
 import Firebase
-
+import StoreKit
 
 class MenuLauncher :NSObject {
     
-    
+    var products = [SKProduct]()
     var homeViewController:HomeViewController?
     override init() {
         super.init()
@@ -105,7 +105,7 @@ class MenuLauncher :NSObject {
     }
     lazy var userUploadfilesButton:UIButton = {
         let btn = UIButton()
-        btn.setTitle("檢視上傳檔案", for: .normal)
+        btn.setTitle("檢視上傳", for: .normal)
         btn.setTitleColor(UIColor.darkText, for: .normal)
         btn.addTarget(self, action: #selector(checkUserUploadFiles), for: .touchUpInside)
         return btn
@@ -162,7 +162,8 @@ class MenuLauncher :NSObject {
     }
     
     func updateVIP() {
-        
+        handleDismiss()
+        homeViewController?.updateVIP()
     }
     
     

@@ -35,7 +35,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     lazy var loginRegisterButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor.blue
+        button.backgroundColor = UIColor.htmlBlue
         button.setTitle("註冊", for: UIControlState())
         button.setTitleColor(UIColor.white, for: UIControlState())
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
@@ -48,7 +48,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     lazy var fbLoginButton:UIButton = {
         let btn = UIButton()
         btn.setTitle("使用FaceBook帳號登入", for: .normal)
-        btn.backgroundColor = UIColor.blue
+        btn.backgroundColor = UIColor.htmlBlue
         btn.addTarget(self, action: #selector(customFBLogin), for: .touchUpInside)
 //        btn.delegate = self
 //        btn.readPermissions = ["email", "public_profile"]
@@ -159,7 +159,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
                 
                 if let profileImageUrl = metadata?.downloadURL()?.absoluteString {
                     
-                    let values = ["name": name, "email": email, "profileImageUrl": profileImageUrl]
+                    let values = ["name": name, "email": email, "profileImageUrl": profileImageUrl,"title":"一般會員"]
                     
                     self.registerUserIntoDatabaseWithUID(uid, values: values as [String : AnyObject])
                 }
@@ -179,8 +179,8 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
                 return
             }
             let user = User(dictionary: values )
-            
-            self.homeViewController?.setupNavBarTitle(user)
+            self.homeViewController?.fetchUserAndSetupNavBarTitle()
+    //        self.homeViewController?.setupNavBarTitle(user)
             self.transitionAnimate()
             self.dismiss(animated: true, completion: nil)
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
@@ -210,12 +210,17 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             handlingLabel.text = "用戶登入中請稍候"
             handlingLabel.textColor = UIColor.white
             spinner.startAnimating()
+            let titleImgeView = UIImageView()
+            titleImgeView.image = #imageLiteral(resourceName: "你說我猜").withRenderingMode(.alwaysTemplate)
+            titleImgeView.tintColor = UIColor.white
+            titleImgeView.contentMode = .scaleAspectFit
+            blackView.addSubview(titleImgeView)
+            titleImgeView.anchor(blackView.topAnchor, left: blackView.leftAnchor, bottom: nil, right: blackView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: window.frame.height/3)
         }
     }
     func transitionAnimate() {
        
         if let window = UIApplication.shared.keyWindow {
-        
          UIView.animate(withDuration: 0.5, animations: {
             self.blackView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: window.frame.height)
          }, completion: { (_) in
@@ -289,7 +294,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.darkGreen
+        view.backgroundColor = UIColor.mainBlue
     
     }
     

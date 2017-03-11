@@ -54,11 +54,13 @@ class TopicCell: UITableViewCell {
     let likeLabel:UILabel = {
         let bl = UILabel()
         bl.adjustsFontSizeToFitWidth = true
+        bl.textAlignment = .center
         return bl
     }()
     let dislikeLabel:UILabel = {
         let bl = UILabel()
         bl.adjustsFontSizeToFitWidth = true
+        bl.textAlignment = .center
         return bl
     }()
     let likeImageView: UIImageView = {
@@ -86,18 +88,19 @@ class TopicCell: UITableViewCell {
         addSubview(dislikeLabel)
         addSubview(dislikeImageView)
         addSubview(timeStampLabel)
-        profileImageView.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: 60, heightConstant: 0)
+        let width = frame.size.width
+        profileImageView.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: width/6, heightConstant: 0)
         profileImageView.addSubview(spinner)
         spinner.anchorCenterSuperview()
         spinner.startAnimating()
-        nameLabel.anchor(profileImageView.topAnchor, left: profileImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 0)
-        likeImageView.anchor(nil, left: nameLabel.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
+        nameLabel.anchor(profileImageView.topAnchor, left: profileImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: likeImageView.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 0)
+        likeImageView.anchor(nil, left: nil, bottom: nil, right: likeLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
         likeImageView.anchorCenterYToSuperview()
-        likeLabel.anchor(profileImageView.topAnchor, left: likeImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: 20, heightConstant: 0)
-        dislikeImageView.anchor(nil, left: likeLabel.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
+        likeLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: dislikeImageView.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 30, heightConstant: 0)
+        dislikeImageView.anchor(nil, left: nil, bottom: nil, right: dislikeLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
         dislikeImageView.anchorCenterYToSuperview()
-        dislikeLabel.anchor(profileImageView.topAnchor, left: dislikeImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: 20, heightConstant: 0)
-        timeStampLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 5, widthConstant: 80, heightConstant: 0)
+        dislikeLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: timeStampLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 30, heightConstant: 0)
+        timeStampLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 5, widthConstant: width/4, heightConstant: 0)
     }
     
     

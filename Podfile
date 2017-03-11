@@ -15,5 +15,6 @@ target 'EnglishGuess' do
   pod 'FBSDKShareKit'
   pod 'FBSDKLoginKit'
   pod 'Firebase/Auth'
+  pod 'GoogleMobileAdsMediationUnity'
 
 end

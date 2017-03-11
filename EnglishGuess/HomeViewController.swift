@@ -9,6 +9,7 @@
 import UIKit
 import Firebase
 import LBTAComponents
+import FBSDKLoginKit
 import StoreKit
 class HomeViewController: UIViewController {
 
@@ -56,6 +57,7 @@ class HomeViewController: UIViewController {
     }
     func handleSetting() {
         menuLauncher.homeViewController = self
+        menuLauncher.products = products
         menuLauncher.showMenuLauncher()
     }
     override func viewWillLayoutSubviews() {
@@ -71,8 +73,8 @@ class HomeViewController: UIViewController {
     
     func checkVIP(){
         products = []
-        EnglishGuessVIP.store.requestProducts{success, products in
-            if success {
+        EnglishGuessVIP.share.store.requestProducts{success, products in
+        if success {
                 self.products = products!
             }
         }
@@ -80,14 +82,14 @@ class HomeViewController: UIViewController {
     
     
     func updateLabelCount() {
-        todayCompletedQuestionLabel.text = "今日已答題數:\(UserDefaults.numberOfQInToday())/10"
-        uploadQuestionLabel.text = "已上傳題數:\(UserDefaults.numberOfUpload())/10"
-        
+        todayCompletedQuestionLabel.update()
+        uploadQuestionLabel.update()
     }
     
     
     lazy var questionSegmentedControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["我要練聽力", "我要練口說"])
+        sc.changeTitleFont(newFontName: "HelveticaNeue-Bold", newFontSize: 16)
         sc.tintColor = UIColor.white
         sc.selectedSegmentIndex = 0
         return sc
@@ -98,21 +100,10 @@ class HomeViewController: UIViewController {
     var uploadQuestions = 0
     let statusView = UIView()
     
-    let todayCompletedQuestionLabel:UILabel = {
-        let label1 = UILabel()
-        label1.textAlignment = .center
-        label1.textColor = UIColor.white
-        return label1
-    }()
-    let uploadQuestionLabel:UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.textColor = UIColor.white
-        return label
-    }()
-    
+    let todayCompletedQuestionLabel = TodayCompletedQuestionLabel()
+    let uploadQuestionLabel = UploadQuestionLabel()
     func setupStatusView() {
-        
+        todayCompletedQuestionLabel.delegateController = self
         statusView.backgroundColor = UIColor.mainBlue
         view.addSubview(statusView)
         statusView.anchor(view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 100)
@@ -121,26 +112,27 @@ class HomeViewController: UIViewController {
         todayCompletedQuestionLabel.anchor(statusView.topAnchor, left: statusView.leftAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: view.frame.size.width/2, heightConstant: 50)
         uploadQuestionLabel.anchor(todayCompletedQuestionLabel.topAnchor, left: todayCompletedQuestionLabel.rightAnchor, bottom: nil, right: statusView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
         
-//        todayCompletedQuestionLabel.text = "今日已答題數:\(CompletedQuestions)/10"
-//        uploadQuestionLabel.text = "已上傳題數:\(uploadQuestions)/10"
         
         statusView.addSubview(questionSegmentedControl)
         questionSegmentedControl.anchor(todayCompletedQuestionLabel.bottomAnchor, left: statusView.leftAnchor, bottom: statusView.bottomAnchor, right: statusView.rightAnchor, topConstant: 15, leftConstant: 50, bottomConstant: 5, rightConstant: 50, widthConstant: 0, heightConstant: 0)
         
     }
     
-    lazy var cat1Button = UIButton.makeCatButton(title: "Cat 1")
-    lazy var cat2Button = UIButton.makeCatButton(title: "Cat 2")
-    lazy var cat3Button = UIButton.makeCatButton(title: "Cat 3")
-    lazy var cat4Button = UIButton.makeCatButton(title: "Cat 4")
-    lazy var cat5Button = UIButton.makeCatButton(title: "Cat 5")
-    lazy var cat6Button = UIButton.makeCatButton(title: "Cat 6")
+    lazy var cat1Button = UIButton.makeCatButton(title: "食物類")
+    lazy var cat2Button = UIButton.makeCatButton(title: "抽象類")
+    lazy var cat3Button = UIButton.makeCatButton(title: "生活類")
+    lazy var cat4Button = UIButton.makeCatButton(title: "自然類")
+    lazy var cat5Button = UIButton.makeCatButton(title: "人物類")
+    lazy var cat6Button = UIButton.makeCatButton(title: "進階類")
     
     func handleCatButtonPress(_ sender:UIButton){
         
         if questionSegmentedControl.selectedSegmentIndex == 1 {
             let recordViewController = RecordViewController()
             recordViewController.category = sender.currentTitle
+            let topics = Topic.share.returnTopicBy(sender.currentTitle!)
+            recordViewController.engTopicAry = Array(topics.values)
+            recordViewController.chineseTopicAry = Array(topics.keys)
             recordViewController.user = user
             navigationController?.pushViewController(recordViewController, animated: true)
         } else {
@@ -164,15 +156,16 @@ class HomeViewController: UIViewController {
         categoryView.addSubview(cat5Button)
         categoryView.addSubview(cat6Button)
         
+        let btnWidth = view.frame.size.width/3.5
         cat3Button.anchorCenterYToSuperview()
-        cat3Button.anchor(nil, left: categoryView.leftAnchor, bottom: nil, right: categoryView.centerXAnchor, topConstant: 0, leftConstant: 12, bottomConstant: 0, rightConstant: 6, widthConstant: 0, heightConstant: 80)
+        cat3Button.anchor(nil, left: nil, bottom: nil, right: categoryView.centerXAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 2.5, widthConstant: btnWidth, heightConstant: btnWidth)
         cat4Button.anchorCenterYToSuperview()
-        cat4Button.anchor(cat3Button.topAnchor, left: categoryView.centerXAnchor, bottom: nil, right: categoryView.rightAnchor, topConstant: 0, leftConstant: 6, bottomConstant: 0, rightConstant: 12, widthConstant: 0, heightConstant: 80)
-        cat1Button.anchor(nil, left: cat3Button.leftAnchor, bottom: cat3Button.topAnchor, right: cat3Button.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 12, rightConstant: 0, widthConstant: 0, heightConstant: 80)
-        cat2Button.anchor(nil, left: cat4Button.leftAnchor, bottom: cat4Button.topAnchor, right: cat4Button.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 12, rightConstant: 0, widthConstant: 0, heightConstant: 80)
+        cat4Button.anchor(cat3Button.topAnchor, left: categoryView.centerXAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 2.5, bottomConstant: 0, rightConstant: 5, widthConstant: btnWidth, heightConstant: btnWidth)
+        cat1Button.anchor(nil, left: cat3Button.leftAnchor, bottom: cat3Button.topAnchor, right: cat3Button.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
+        cat2Button.anchor(nil, left: cat4Button.leftAnchor, bottom: cat4Button.topAnchor, right: cat4Button.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
         
-        cat5Button.anchor(cat3Button.bottomAnchor, left: cat3Button.leftAnchor, bottom: nil, right: cat3Button.rightAnchor, topConstant: 12, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 80)
-        cat6Button.anchor(cat4Button.bottomAnchor, left: cat4Button.leftAnchor, bottom: nil, right: cat4Button.rightAnchor, topConstant: 12, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 80)
+        cat5Button.anchor(cat3Button.bottomAnchor, left: cat3Button.leftAnchor, bottom: nil, right: cat3Button.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
+        cat6Button.anchor(cat4Button.bottomAnchor, left: cat4Button.leftAnchor, bottom: nil, right: cat4Button.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
         
     }
     
@@ -180,11 +173,11 @@ class HomeViewController: UIViewController {
     func setupTitleImageView() {
         
         let titleImageView = UIImageView()
-        titleImageView.image = #imageLiteral(resourceName: "英文猜猜樂").withRenderingMode(.alwaysTemplate)
+        titleImageView.image = #imageLiteral(resourceName: "你說我猜").withRenderingMode(.alwaysTemplate)
         titleImageView.tintColor = UIColor.titleViewCyan
-        titleImageView.contentMode = .scaleAspectFill
+        titleImageView.contentMode = .scaleAspectFit
         view.addSubview(titleImageView)
-        titleImageView.anchor(statusView.bottomAnchor, left: view.leftAnchor, bottom: cat1Button.topAnchor, right: view.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        titleImageView.anchor(statusView.bottomAnchor, left: view.leftAnchor, bottom: cat1Button.topAnchor, right: view.rightAnchor, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: 0, heightConstant: 0)
         
     }
     
@@ -193,16 +186,16 @@ class HomeViewController: UIViewController {
         if FIRAuth.auth()?.currentUser?.uid == nil {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
-            
             fetchUserAndSetupNavBarTitle()
         }
     }
+    var UserID:String = ""
     func fetchUserAndSetupNavBarTitle() {
         guard let uid = FIRAuth.auth()?.currentUser?.uid else {
             //for some reason uid = nil
             return
         }
-        
+        UserID = uid
         FIRDatabase.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
             
             if let dictionary = snapshot.value as? [String: AnyObject] {
@@ -216,13 +209,15 @@ class HomeViewController: UIViewController {
             
         }, withCancel: nil)
     }
-
+    let titleLabel = UILabel()
     func setupNavBarTitle(_ user:User) {
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
         //        titleView.backgroundColor = UIColor.redColor()
-        
-        
+        if let title = user.title {
+        settingUserQuota(title)
+            titleLabel.text = title
+        }
         let containerView = UIView()
         titleView.addSubview(containerView)
         
@@ -247,18 +242,40 @@ class HomeViewController: UIViewController {
         containerView.addSubview(nameLabel)
         nameLabel.textColor = UIColor.white
         nameLabel.text = user.name ?? ""
+        nameLabel.adjustsFontSizeToFitWidth = true
        
-        nameLabel.anchor(nil, left: profileImageView.rightAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 8, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        nameLabel.anchor(nil, left: profileImageView.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 8, bottomConstant: 0, rightConstant: 0, widthConstant: 80, heightConstant: 40)
         nameLabel.anchorCenterYToSuperview()
-
+        
+        containerView.addSubview(titleLabel)
+        titleLabel.textColor = UIColor.white
+        titleLabel.anchor(nil, left: nameLabel.rightAnchor, bottom: nil, right: containerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        titleLabel.anchorCenterYToSuperview()
+        
         containerView.anchorCenterSuperview()
         self.navigationItem.titleView = titleView
+        
+    }
+    
+    func settingUserQuota(_ title:String) {
+        
+        if title == "一般會員" {
+            UserDefaults.standard.set(10, forKey: "\(UserID)userUploadQuota")
+            UserDefaults.standard.set(10, forKey: "\(UserID)userAnswerQuotaForJudge")
+            UserDefaults.standard.set("10", forKey: "\(UserID)userAnswerQuota")
+        } else {
+            UserDefaults.standard.set(100, forKey: "\(UserID)userUploadQuota")
+            UserDefaults.standard.set(9999, forKey: "\(UserID)userAnswerQuotaForJudge")
+            UserDefaults.standard.set("不限", forKey: "\(UserID)userAnswerQuota")
+            
+        }
         
     }
     
     func handleLogout() {
         
         do {
+            FBSDKLoginManager().logOut()
             try FIRAuth.auth()?.signOut()
         } catch let logoutError {
             print(logoutError)
@@ -274,6 +291,7 @@ class HomeViewController: UIViewController {
     func showUserUploadFiles() {
         let userFilesVC = UserFilesViewController()
         navigationController?.pushViewController(userFilesVC, animated: true)
+        
         
     }
 

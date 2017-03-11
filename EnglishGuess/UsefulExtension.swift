@@ -93,6 +93,9 @@ extension UIColor {
     static let darkGreen = {
         return UIColor(r: 18, g: 110, b: 131)
     }()
+    static let midleBlue = {
+        return UIColor(r: 52, g: 138, b: 164)
+    }()
     
 }
 
@@ -212,6 +215,27 @@ extension UserDefaults {
         }
         return 0
     }
+    static func userUploadQuota() -> Int {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return 10}
+        if let number = UserDefaults.standard.object(forKey: "\(uid)userUploadQuota") as? Int {
+            return number
+        }
+        return 10
+    }
+    static func userAnswerQuotaForJudge() -> Int {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return 10}
+        if let number = UserDefaults.standard.object(forKey: "\(uid)userAnswerQuotaForJudge") as? Int {
+            return number
+        }
+        return 10
+    }
+    static func userAnswerQuota() -> String {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else { return "10"}
+        if let number = UserDefaults.standard.object(forKey: "\(uid)userAnswerQuota") as? String {
+            return number
+        }
+        return "10"
+    }
     
 }
 
@@ -223,6 +247,13 @@ extension Date {
     formater.dateStyle = .short
     return formater.string(from: date)
     
+    }
+}
+
+extension UISegmentedControl{
+    func changeTitleFont(newFontName:String?, newFontSize:CGFloat?){
+        let attributedSegmentFont = NSDictionary(object: UIFont(name: newFontName!, size: newFontSize!)!, forKey: NSFontAttributeName as NSCopying)
+        setTitleTextAttributes(attributedSegmentFont as [NSObject : AnyObject], for: .normal)
     }
 }
 
@@ -256,7 +287,7 @@ extension UIButton {
         btn.setTitle(title, for: .normal)
         btn.addTarget(HomeViewController(), action: #selector(HomeViewController.handleCatButtonPress), for: .touchUpInside)
         btn.setTitleColor(UIColor.white, for: .normal)
-        btn.backgroundColor = UIColor.adoptRed
+        btn.backgroundColor = UIColor.adoptBlue
         btn.layer.shadowColor = UIColor.black.cgColor
         btn.layer.shadowOffset = CGSize(width: -2, height: 2)
         btn.layer.shadowOpacity = 0.8
@@ -265,4 +296,23 @@ extension UIButton {
         return btn
     }
 
+}
+
+
+class UploadQuestionLabel:UILabel {
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        textAlignment = .center
+        textColor = UIColor.white
+        text = "已上傳題數:\(UserDefaults.numberOfUpload())/\(UserDefaults.userUploadQuota())"
+    }
+    func update() {
+        text = "已上傳題數:\(UserDefaults.numberOfUpload())/\(UserDefaults.userUploadQuota())"
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }

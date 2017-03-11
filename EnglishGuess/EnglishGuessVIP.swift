@@ -11,11 +11,12 @@ import Foundation
 
 public struct EnglishGuessVIP {
     
-    public static let productID = "ios.swift.VIP"
+    static let share = EnglishGuessVIP()
+    let productID = "ios.swift.VIP"
     
-    fileprivate static let productIdentifiers: Set<ProductIdentifier> = [EnglishGuessVIP.productID]
+  //  let productIdentifiers: Set<ProductIdentifier> = [productID]
     
-    public static let store = IAPHelper(productIds: EnglishGuessVIP.productIdentifiers)
+    let store = IAPHelper(productIds: ["ios.swift.VIP"])
 }
 
 

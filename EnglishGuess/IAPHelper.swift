@@ -21,12 +21,14 @@
 */
 
 import StoreKit
-
+import Firebase
 public typealias ProductIdentifier = String
 public typealias ProductsRequestCompletionHandler = (_ success: Bool, _ products: [SKProduct]?) -> ()
 
 open class IAPHelper : NSObject  {
   
+    
+  var homeViewController:HomeViewController?
   static let IAPHelperPurchaseNotification = "IAPHelperPurchaseNotification"
   fileprivate let productIdentifiers: Set<ProductIdentifier>
   fileprivate var purchasedProductIdentifiers = Set<ProductIdentifier>()
@@ -118,7 +120,7 @@ extension IAPHelper: SKPaymentTransactionObserver {
     for transaction in transactions {
       switch (transaction.transactionState) {
       case .purchased:
-        complete(transaction: transaction)
+        updateUserTitle(transaction: transaction)
         break
       case .failed:
         fail(transaction: transaction)
@@ -167,4 +169,28 @@ extension IAPHelper: SKPaymentTransactionObserver {
     UserDefaults.standard.synchronize()
     NotificationCenter.default.post(name: NSNotification.Name(rawValue: IAPHelper.IAPHelperPurchaseNotification), object: identifier)
   }
+    
+    private  func updateUserTitle(transaction: SKPaymentTransaction){
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+            //for some reason uid = nil
+            return
+        }
+
+        let userReference = FIRDatabase.database().reference().child("users").child(uid)
+        let Values = ["title":"VIP"]
+        userReference.updateChildValues(Values) { (error, ref) in
+            if error != nil {
+                print (error)
+            }
+            UserDefaults.standard.set(100, forKey: "\(uid)userUploadQuota")
+            UserDefaults.standard.set(9999, forKey: "\(uid)userAnswerQuotaForJudge")
+            UserDefaults.standard.set("不限", forKey: "\(uid)userAnswerQuota")
+            self.homeViewController?.updateLabelCount()
+            self.homeViewController?.titleLabel.text = "VIP"
+            self.complete(transaction: transaction)
+        }
+        
+    }
+    
+    
 }

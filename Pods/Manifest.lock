@@ -43,6 +43,10 @@ PODS:
     - FirebaseAnalytics (~> 3.7)
     - GTMSessionFetcher/Core (~> 1.1)
   - Google-Mobile-Ads-SDK (7.17.0)
+  - GoogleMobileAdsMediationUnity (2.0.8.0):
+    - Google-Mobile-Ads-SDK (>= 7.10.1)
+    - GoogleMobileAdsMediationUnityAdsSDK (= 2.0.8)
+  - GoogleMobileAdsMediationUnityAdsSDK (2.0.8)
   - GoogleToolboxForMac/DebugUtils (2.1.1):
     - GoogleToolboxForMac/Defines (= 2.1.1)
   - GoogleToolboxForMac/Defines (2.1.1)
@@ -65,6 +69,7 @@ DEPENDENCIES:
   - Firebase/Core
   - Firebase/Database
   - Firebase/Storage
+  - GoogleMobileAdsMediationUnity
   - LBTAComponents (~> 0.1.9)
 
 SPEC CHECKSUMS:
@@ -80,10 +85,12 @@ SPEC CHECKSUMS:
   FirebaseInstanceID: 2d0518b1378fe9d685ef40cbdd63d2fdc1125339
   FirebaseStorage: 63628572a5fde258f8e933b5fb42697468da0158
   Google-Mobile-Ads-SDK: a8bf4211624999b73e4184be516f94770b139525
+  GoogleMobileAdsMediationUnity: 6193be69196152c067a5c971f5c03fe9f870a233
+  GoogleMobileAdsMediationUnityAdsSDK: 44c683996a2303a837c1def3b0e3e8a984e0f330
   GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
   GTMSessionFetcher: 6f8d8b28b7e345549ac471071608170b31cb4977
   LBTAComponents: 9a5d314080d1f80208062ccc81a2d25225c5f572
 
-PODFILE CHECKSUM: ad1ed34cc939a971d1e16088651224b7b27ebee1
+PODFILE CHECKSUM: 795dc274d2c7719c8b7cda731444929604ff9218
 
 COCOAPODS: 1.1.1

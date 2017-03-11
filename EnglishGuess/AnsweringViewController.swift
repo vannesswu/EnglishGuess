@@ -24,6 +24,7 @@ class AnsweringViewController:UIViewController {
     var isLike = false
     var isDislike = false
     var recordRef: FIRDatabaseReference?
+    var recordings = [Recording]()
     var numberOfQ:Int = {
         return UserDefaults.numberOfQInToday()
     }()
@@ -43,6 +44,11 @@ class AnsweringViewController:UIViewController {
         } catch {
             // failed to record!
         }
+        
+        
+        let changeTopicBarButtonItem = UIBarButtonItem(title: "換一題", style: .plain, target: self, action: #selector(chooseRandomRecording))
+        navigationItem.rightBarButtonItems = [changeTopicBarButtonItem]
+       
         showhandlingupload()
         fetchRecordingData { (data) in
             self.blackView.removeFromSuperview()
@@ -56,6 +62,32 @@ class AnsweringViewController:UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(AnsweringViewController.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(AnsweringViewController.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
+    
+    
+    
+    
+    func chooseRandomRecording() {
+        if UserDefaults.numberOfQInToday() < UserDefaults.userAnswerQuotaForJudge() {
+            let randomIndex = Int(arc4random_uniform(UInt32(recordings.count)))
+            anserTextField.text = ""
+            anserTextField.isEnabled = true
+            checkAnswerButton.isEnabled = true
+            checkAnswerButton.alpha = 1
+            showhandlingupload()
+            recording = recordings[randomIndex]
+            fetchRecordingData { (data) in
+                self.blackView.removeFromSuperview()
+                self.recordingData = data
+                self.topicLabel.text = "答案為: ?? "
+            }
+        } else {
+            let alertController = UIAlertController(title: "今日答題錯誤次數已滿", message: "點擊廣告回復次數", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alertController.addAction(okAction)
+            present(alertController, animated: true, completion: nil)
+        }
+    }
+    
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -81,23 +113,28 @@ class AnsweringViewController:UIViewController {
     }
     
     let titleView = UIView()
-    let numberOfQLabel = UILabel()
-    
+    let numberOfQLabel = TodayCompletedQuestionLabel()
     override func viewWillLayoutSubviews() {
         setupTitleView()
     }
     func setupTitleView() {
-        navigationItem.titleView = titleView
-        numberOfQLabel.textColor = UIColor.white
-        titleView.addSubview(numberOfQLabel)
+        let titleView = UIView()
+        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playad)))
+        titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        let containerView = UIView()
+        titleView.addSubview(containerView)
+        containerView.addSubview(numberOfQLabel)
         numberOfQLabel.anchorCenterSuperview()
-        updateLabelCount()
+        numberOfQLabel.delegateController = self
+        containerView.anchorCenterSuperview()
+        navigationItem.titleView = titleView
     }
-    
-    func updateLabelCount() {
-        numberOfQLabel.text = "今日已答題數:\(UserDefaults.numberOfQInToday())/10"
+    func playad() {
+        numberOfQLabel.playVideo()
+           }
+    override func viewWillAppear(_ animated: Bool) {
+        numberOfQLabel.update()
     }
-    
     let blackView = UIView()
     let spinner = UIActivityIndicatorView()
     let handlingLabel = UILabel()
@@ -302,13 +339,18 @@ class AnsweringViewController:UIViewController {
     func checkAnswer() {
         anserTextField.resignFirstResponder()
         guard let userAnswer = anserTextField.text , userAnswer != "" , let answer = recording?.chAnswer else { return }
-        numberOfQ += 1
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
         UserDefaults.standard.set(numberOfQ, forKey: uid+Date.returnTodayString())
-        updateLabelCount()
+        numberOfQLabel.update()
         anserTextField.isEnabled = false
         checkAnswerButton.isEnabled = false
+        checkAnswerButton.alpha = 0.5
         let isCorrect = userAnswer == answer ? true : false
+        if !isCorrect {
+        numberOfQ += 1
+        UserDefaults.standard.set(numberOfQ, forKey: uid+Date.returnTodayString())
+        numberOfQLabel.update()
+        }
         animateTheCheckResult(isCorrect)
         if let totalclick = recording?.totalClick, let correct = recording?.correct {
         recording?.totalClick = totalclick + 1
