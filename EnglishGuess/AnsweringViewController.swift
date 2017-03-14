@@ -48,7 +48,11 @@ class AnsweringViewController:UIViewController {
         
         let changeTopicBarButtonItem = UIBarButtonItem(title: "換一題", style: .plain, target: self, action: #selector(chooseRandomRecording))
         navigationItem.rightBarButtonItems = [changeTopicBarButtonItem]
-       
+        let backImage = #imageLiteral(resourceName: "back").withRenderingMode(.alwaysTemplate)
+        let backBarButtonItem = UIBarButtonItem(image: backImage, style: .plain, target: self, action: #selector(dismissVC))
+        navigationItem.leftBarButtonItems = [backBarButtonItem]
+        
+        
         showhandlingupload()
         fetchRecordingData { (data) in
             self.blackView.removeFromSuperview()
@@ -63,10 +67,24 @@ class AnsweringViewController:UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(AnsweringViewController.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
     
-    
+    func dismissVC() {
+        if checkUserIsAnswer {
+            present(remindUserAnswerAlert, animated: true, completion: nil)
+            return
+        }
+        resultView.removeFromSuperview()
+        _ = navigationController?.popViewController(animated: true)
+    }
     
     
     func chooseRandomRecording() {
+        
+        if checkUserIsAnswer {
+            present(remindUserAnswerAlert, animated: true, completion: nil)
+            return
+        
+        }
+        
         if UserDefaults.numberOfQInToday() < UserDefaults.userAnswerQuotaForJudge() {
             let randomIndex = Int(arc4random_uniform(UInt32(recordings.count)))
             anserTextField.text = ""
@@ -75,10 +93,16 @@ class AnsweringViewController:UIViewController {
             checkAnswerButton.alpha = 1
             showhandlingupload()
             recording = recordings[randomIndex]
+            if let id = recording?.id ,let categoary = self.categoary {
+                recordRef = FIRDatabase.database().reference().child("users-recordings").child(categoary).child(id)
+            }
+            
+            
             fetchRecordingData { (data) in
                 self.blackView.removeFromSuperview()
                 self.recordingData = data
                 self.topicLabel.text = "答案為: ?? "
+                self.updateProviderInfo()
             }
         } else {
             let alertController = UIAlertController(title: "今日答題錯誤次數已滿", message: "點擊廣告回復次數", preferredStyle: .alert)
@@ -258,7 +282,14 @@ class AnsweringViewController:UIViewController {
         return label
     }()
     
-    
+    func updateProviderInfo(){
+        if let url = self.recording?.profileImageUrl {
+            providerProfileImageView.loadImage(urlString: url)
+        }
+        providerLabel.text = self.recording?.userName ?? ""
+        likeLabel.text = "\(self.recording?.likes ?? 0 )"
+        dislikeLabel.text = "\(self.recording?.dislikes ?? 0 )"
+    }
     
     func setupProviderView() {
         view.addSubview(providerLabel)
@@ -269,7 +300,7 @@ class AnsweringViewController:UIViewController {
         view.addSubview(dislikeLabel)
         
         providerProfileImageView.anchor(nil, left: view.leftAnchor, bottom: view.bottomAnchor, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 5, rightConstant: 0, widthConstant: 30, heightConstant: 30)
-        providerLabel.anchor(nil, left: providerProfileImageView.rightAnchor, bottom: providerProfileImageView.bottomAnchor, right: likeButton.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 30)
+        providerLabel.anchor(nil, left: providerProfileImageView.rightAnchor, bottom: providerProfileImageView.bottomAnchor, right: likeButton.leftAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 30)
         dislikeLabel.anchor(nil, left: nil, bottom: view.bottomAnchor, right: view.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 10, rightConstant: 10, widthConstant: 50, heightConstant: 20)
         dislikeButton.anchor(nil , left: nil, bottom: dislikeLabel.bottomAnchor, right: dislikeLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 5, widthConstant: 25, heightConstant: 25)
         likeLabel.anchor(nil, left: nil, bottom: dislikeLabel.bottomAnchor, right: dislikeButton.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 50, heightConstant: 20)
@@ -337,8 +368,10 @@ class AnsweringViewController:UIViewController {
     }
     
     func checkAnswer() {
+        
         anserTextField.resignFirstResponder()
         guard let userAnswer = anserTextField.text , userAnswer != "" , let answer = recording?.chAnswer else { return }
+        checkUserIsAnswer = false
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
         UserDefaults.standard.set(numberOfQ, forKey: uid+Date.returnTodayString())
         numberOfQLabel.update()
@@ -388,7 +421,17 @@ class AnsweringViewController:UIViewController {
         }
     }
     
+    lazy var remindUserAnswerAlert:UIAlertController = {
+        let at = UIAlertController(title: "您尚未答題", message: "請輸入答案並選擇確認", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        at.addAction(okAction)
+        return at
+    }()
+    
+    var checkUserIsAnswer = false
+    
     func playrecording() {
+        checkUserIsAnswer = true
         PlayButton.isEnabled = false
         PlayButton.alpha = 0.5
         if let data = recordingData {

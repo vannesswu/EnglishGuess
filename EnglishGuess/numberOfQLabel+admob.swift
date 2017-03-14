@@ -40,7 +40,8 @@ class TodayCompletedQuestionLabel:UILabel, GADRewardBasedVideoAdDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     func playVideo(){
-        if rewardBasedVideo?.isReady == true, UserDefaults.numberOfUpload() == UserDefaults.userUploadQuota() {
+        if rewardBasedVideo?.isReady == true, UserDefaults.numberOfQInToday()
+            >= UserDefaults.userUploadQuota() {
             UIWindow.removeStatusBar()
             rewardBasedVideo?.present(fromRootViewController: delegateController!)
         }

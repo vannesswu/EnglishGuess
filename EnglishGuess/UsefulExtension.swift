@@ -83,7 +83,6 @@ extension UIColor {
     static let valid = {
         return UIColor(r: 47, g: 68, b: 86)
     }()
-    
     static let buyRed = {
         return UIColor(r: 247, g: 70, b: 77)
     }()
@@ -96,6 +95,27 @@ extension UIColor {
     static let midleBlue = {
         return UIColor(r: 52, g: 138, b: 164)
     }()
+    static let guessPink = {
+        return UIColor(r: 216, g: 21, b: 93)
+    }()
+    static let guessPurple = {
+        return UIColor(r: 172, g: 46, b: 215)
+    }()
+    static let guessGreen = {
+        return UIColor(r: 87, g: 150, b: 86)
+    }()
+    static let guessYellow = {
+        return UIColor(r: 231, g: 186, b: 6)
+    }()
+    static let guessBlue = {
+        return UIColor(r: 51, g: 83, b: 172)
+    }()
+    static let guessGray = {
+        return UIColor(r: 116, g: 145, b: 154)
+    }()
+
+    
+    
     
 }
 
@@ -315,4 +335,16 @@ class UploadQuestionLabel:UILabel {
         fatalError("init(coder:) has not been implemented")
     }
     
+}
+
+extension UIImageView {
+    
+    static func makeBackgroundImageView(withImage:UIImage) -> UIImageView{
+            let iv = UIImageView()
+            iv.image = withImage.withRenderingMode(.alwaysTemplate)
+            iv.alpha = 0.1
+            iv.tintColor = UIColor.white
+            iv.contentMode = .scaleAspectFill
+            return iv
+    }
 }

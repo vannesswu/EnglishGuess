@@ -81,17 +81,17 @@ class QuestionViewController: UITableViewController {
         recordings = [Recording]()
         showhandlingupload()
         let recordingsReference = FIRDatabase.database().reference().child("users-recordings").child(category).queryLimited(toLast: 500)
-     
+        
         recordingsReference.observeSingleEvent(of:.value, with: { (snapshot) in
             
             if let dictionary = snapshot.value as? [String: AnyObject] {
-            
-                for (_,value) in dictionary  {
-                if let recordDict = value as? [String: AnyObject] {
-                   
-                let recording = Recording(dictionary: recordDict)
-                 self.recordings.append(recording)
                 
+                for (_,value) in dictionary  {
+                    if let recordDict = value as? [String: AnyObject] {
+                        
+                        let recording = Recording(dictionary: recordDict)
+                        self.recordings.append(recording)
+                        
                     }
                 }
                 DispatchQueue.main.async {
@@ -103,7 +103,8 @@ class QuestionViewController: UITableViewController {
                 self.blackView.removeFromSuperview()
             }
             
-            }, withCancel: nil)
+        }, withCancel: nil)
+        
     }
     
     

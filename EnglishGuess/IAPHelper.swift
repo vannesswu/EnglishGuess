@@ -147,6 +147,9 @@ extension IAPHelper: SKPaymentTransactionObserver {
  
     print("restore... \(productIdentifier)")
     deliverPurchaseNotificationFor(identifier: productIdentifier)
+    if isProductPurchased(productIdentifier) {
+        updateUserTitle(transaction: transaction)
+    }
     SKPaymentQueue.default().finishTransaction(transaction)
   }
  

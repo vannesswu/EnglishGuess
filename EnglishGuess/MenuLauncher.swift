@@ -35,7 +35,6 @@ class MenuLauncher :NSObject {
     }()
     func showMenuLauncher() {
         if let window = UIApplication.shared.keyWindow {
-            
             blackView.backgroundColor = UIColor(white: 0, alpha: 0.5)
             blackView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDismiss)))
             window.addSubview(blackView)

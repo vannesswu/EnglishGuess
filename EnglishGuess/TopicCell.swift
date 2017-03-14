@@ -93,7 +93,7 @@ class TopicCell: UITableViewCell {
         profileImageView.addSubview(spinner)
         spinner.anchorCenterSuperview()
         spinner.startAnimating()
-        nameLabel.anchor(profileImageView.topAnchor, left: profileImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: likeImageView.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 0)
+        nameLabel.anchor(profileImageView.topAnchor, left: profileImageView.rightAnchor, bottom: profileImageView.bottomAnchor, right: likeImageView.leftAnchor, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 0)
         likeImageView.anchor(nil, left: nil, bottom: nil, right: likeLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
         likeImageView.anchorCenterYToSuperview()
         likeLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: dislikeImageView.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 30, heightConstant: 0)

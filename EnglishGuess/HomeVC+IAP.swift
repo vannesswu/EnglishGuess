@@ -40,9 +40,17 @@ extension HomeViewController {
             EnglishGuessVIP.share.store.homeViewController = self
             EnglishGuessVIP.share.store.buyProduct(product)
         }
+        let restoreAction = UIAlertAction(title: "恢復購買", style: UIAlertActionStyle.default) { (action) in
+            EnglishGuessVIP.share.store.homeViewController = self
+            EnglishGuessVIP.share.store.restorePurchases()
+        }
+        
+                
+                
         let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
+        alertController.addAction(restoreAction)
         present(alertController, animated: true, completion: nil)
             }
      }

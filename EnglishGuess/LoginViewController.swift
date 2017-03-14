@@ -18,12 +18,16 @@ enum registerMethod {
     
 }
 
-
 class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     
     var homeViewController: HomeViewController?
-
+    lazy var isUserConfirmAlert:UIAlertController = {
+        let at = UIAlertController(title: "您尚未勾選用戶協議", message: "請先閱讀用戶協議並選取確認", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        at.addAction(okAction)
+        return at
+    }()
     
     let inputsContainerView: UIView = {
         let view = UIView()
@@ -33,13 +37,17 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         return view
     }()
     
+    lazy var userAgreement:UserAgreement = {
+        return UserAgreement()
+    }()
+    
+    
     lazy var loginRegisterButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = UIColor.htmlBlue
         button.setTitle("註冊", for: UIControlState())
         button.setTitleColor(UIColor.white, for: UIControlState())
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
-        
         button.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
         
         return button
@@ -50,25 +58,23 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         btn.setTitle("使用FaceBook帳號登入", for: .normal)
         btn.backgroundColor = UIColor.htmlBlue
         btn.addTarget(self, action: #selector(customFBLogin), for: .touchUpInside)
-//        btn.delegate = self
-//        btn.readPermissions = ["email", "public_profile"]
         return btn
     }()
     lazy var  loginButton :FBSDKButton = {
         let loginButton = FBSDKLoginButton()
-       
         loginButton.delegate = self
         loginButton.readPermissions = ["email", "public_profile"]
-
         return loginButton
     }()
-    
-    
     
     func handleLoginRegister() {
         if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
             handleLogin()
         } else {
+            if !isUserConfirm {
+                self.present(isUserConfirmAlert, animated: true, completion: nil)
+                return
+            }
             handleRegister()
         }
     }
@@ -83,14 +89,19 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             
             if error != nil {
                 print(error ?? "")
+                self.blackView.removeFromSuperview()
+                let alertController = UIAlertController(title: "Oop 出錯了", message: error?.localizedDescription, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
                 return
             }
             
             //successfully logged in our user
             
-       //     self.messagesController?.fetchUserAndSetupNavBarTitle()
+            self.homeViewController?.fetchUserAndSetupNavBarTitle()
             self.transitionAnimate()
-            self.dismiss(animated: true, completion: nil)
+       //     self.dismiss(animated: false, completion: nil)
             
         })
         
@@ -105,6 +116,10 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: { (user: FIRUser?, error) in
             
             if error != nil {
+                let alertController = UIAlertController(title: "Oop 出錯了", message: error?.localizedDescription, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
                 print(error ?? "")
                 return
             }
@@ -118,8 +133,6 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         guard let uid = FIRAuth.auth()?.currentUser?.uid else {
             return
         }
-        
-        
         var email:String = ""
         var name:String = ""
         
@@ -140,10 +153,6 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             name = userName
             
         }
-        
-        
-        
-        
         //successfully authenticated user
         let imageName = UUID().uuidString
         let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).jpg")
@@ -178,14 +187,12 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
                 print(err ?? "")
                 return
             }
-            let user = User(dictionary: values )
+            
             self.homeViewController?.fetchUserAndSetupNavBarTitle()
-    //        self.homeViewController?.setupNavBarTitle(user)
             self.transitionAnimate()
-            self.dismiss(animated: true, completion: nil)
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-//            self.transitionAnimate()
-//            }
+     //       self.dismiss(animated: false, completion: nil)
+            
+
         })
     }
     
@@ -223,8 +230,11 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         if let window = UIApplication.shared.keyWindow {
          UIView.animate(withDuration: 0.5, animations: {
             self.blackView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: window.frame.height)
+            
          }, completion: { (_) in
             self.blackView.removeFromSuperview()
+            self.dismiss(animated: true, completion: nil)
+     //       self.blackView.removeFromSuperview()
 
          })
             
@@ -244,9 +254,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         
         picker.delegate = self
         picker.allowsEditing = true
-        
         present(picker, animated: true, completion: nil)
-
     }
     lazy var loginRegisterSegmentedControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["登入", "註冊"])
@@ -285,7 +293,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     
     lazy var passwordTextField: UITextField = {
         let tf = UITextField()
-        tf.placeholder = "密碼"
+        tf.placeholder = "密碼(至少六個字元)"
         tf.delegate = self
         tf.isSecureTextEntry = true
         return tf
@@ -302,6 +310,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         setupInputsContainerView()
         setupLoginRegisterSegmentedControl()
         setupProfileImageView()
+        setupUserAgreementView()
         setupLoginRegisterButton()
         setupFBLoginButton()
         
@@ -337,13 +346,53 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         emailTextField.anchor(nameTextField.bottomAnchor, left: nameTextField.leftAnchor, bottom: nil, right: nameTextField.rightAnchor , topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
         emailSeparatorView.anchor(nil, left: inputsContainerView.leftAnchor, bottom: emailTextField.bottomAnchor, right: inputsContainerView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         passwordTextField.anchor(emailTextField.bottomAnchor, left: nameTextField.leftAnchor, bottom: inputsContainerView.bottomAnchor, right: nameTextField.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 50)
-        
-        
+    }
+    
+    var isUserConfirm = false
+    lazy var checkImageView:UIImageView = {
+        let iv = UIImageView()
+        iv.layer.borderWidth = 4
+        iv.layer.borderColor = UIColor.black.cgColor
+        iv.contentMode = .scaleAspectFill
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(changeImage)))
+        return iv
+    }()
+    var prefixLabel:UILabel = {
+        let label = UILabel()
+        label.text = "我已閱讀並同意"
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
+    lazy var userAgreementButton:UIButton = {
+        let btn = UIButton()
+        btn.setTitle("<<用戶協議>>", for: .normal)
+        btn.setTitleColor(UIColor.blue, for: .normal)
+        btn.addTarget(self, action: #selector(showuserAgreement), for: .touchUpInside)
+        return btn
+    }()
+    
+    func setupUserAgreementView(){
+        view.addSubview(checkImageView)
+        view.addSubview(prefixLabel)
+        view.addSubview(userAgreementButton)
+        checkImageView.anchor(inputsContainerView.bottomAnchor, left: inputsContainerView.leftAnchor, bottom: nil, right: nil, topConstant: 5, leftConstant: 30, bottomConstant: 0, rightConstant: 0, widthConstant: 20, heightConstant: 20)
+        prefixLabel.anchor(checkImageView.topAnchor, left: checkImageView.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 5, bottomConstant: 0, rightConstant: 0, widthConstant: 100, heightConstant: 20)
+        userAgreementButton.anchor(checkImageView.topAnchor, left: prefixLabel.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 120, heightConstant: 20)
         
     }
+    func showuserAgreement() {
+        present(userAgreement, animated: true, completion: nil)
+    }
+    func changeImage(){
+        isUserConfirm = !isUserConfirm
+        checkImageView.image = isUserConfirm ?  #imageLiteral(resourceName: "check") : nil
+      
+    }
+    
     func setupLoginRegisterButton() {
         view.addSubview(loginRegisterButton)
-        loginRegisterButton.anchor(inputsContainerView.bottomAnchor, left: inputsContainerView.leftAnchor, bottom: nil, right: inputsContainerView.rightAnchor, topConstant: 20, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
+        loginRegisterButton.anchor(checkImageView.bottomAnchor, left: inputsContainerView.leftAnchor, bottom: nil, right: inputsContainerView.rightAnchor, topConstant: 20, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 40)
         loginRegisterButton.anchorCenterXToSuperview()
         
     }
@@ -357,7 +406,8 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         print("Did log out of facebook")
     }
     
-    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result:
+        FBSDKLoginManagerLoginResult!, error: Error!) {
         if error != nil {
             print(error)
             return
@@ -367,7 +417,10 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     }
     
     func customFBLogin() {
-        
+        if !isUserConfirm {
+            self.present(isUserConfirmAlert, animated: true, completion: nil)
+            return
+        }
         FBSDKLoginManager().logIn(withReadPermissions: ["email","public_profile"], from: self) { (result, err) in
             if err != nil {
                 print("Custom FB Login failed:", err ?? "")
@@ -375,10 +428,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             }
             self.handleFBLogin()
         }
-        
     }
-    
-    
     var fbUserDict:[String:AnyObject]?
     func handleFBLogin() {
   
@@ -409,11 +459,7 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
                 }
             }
         })
-        
-
     }
-    
-    
 }
 
 extension LoginViewController : UIImagePickerControllerDelegate , UINavigationControllerDelegate {
@@ -425,23 +471,18 @@ extension LoginViewController : UIImagePickerControllerDelegate , UINavigationCo
         if let editedImage = info["UIImagePickerControllerEditedImage"] as? UIImage {
             selectedImageFromPicker = editedImage
         } else if let originalImage = info["UIImagePickerControllerOriginalImage"] as? UIImage {
-            
             selectedImageFromPicker = originalImage
         }
-        
         if let selectedImage = selectedImageFromPicker {
             profileImageView.image = selectedImage
         }
-        
         dismiss(animated: true, completion: nil)
-        
     }
-    
+
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         print("canceled picker")
         dismiss(animated: true, completion: nil)
     }
-
 }
 
 extension LoginViewController : UITextFieldDelegate {

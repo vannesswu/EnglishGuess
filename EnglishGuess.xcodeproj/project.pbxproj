@@ -20,6 +20,7 @@
 		6155DB101E727CF700E21190 /* HomeVC+IAP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6155DB0F1E727CF700E21190 /* HomeVC+IAP.swift */; };
 		6155DB121E72D47900E21190 /* numberOfQLabel+admob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6155DB111E72D47900E21190 /* numberOfQLabel+admob.swift */; };
 		6155DB141E73FDCE00E21190 /* Topic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6155DB131E73FDCE00E21190 /* Topic.swift */; };
+		6155DB161E75776E00E21190 /* UserAgreement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6155DB151E75776E00E21190 /* UserAgreement.swift */; };
 		61806B461E6D475000DFF905 /* UsefulExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61806B451E6D475000DFF905 /* UsefulExtension.swift */; };
 		61806B481E6D4A1800DFF905 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 61806B471E6D4A1800DFF905 /* Assets.xcassets */; };
 		61806B4B1E6D56D400DFF905 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61806B4A1E6D56D400DFF905 /* User.swift */; };
@@ -47,6 +48,7 @@
 		6155DB0F1E727CF700E21190 /* HomeVC+IAP.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "HomeVC+IAP.swift"; sourceTree = "<group>"; };
 		6155DB111E72D47900E21190 /* numberOfQLabel+admob.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "numberOfQLabel+admob.swift"; sourceTree = "<group>"; };
 		6155DB131E73FDCE00E21190 /* Topic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Topic.swift; sourceTree = "<group>"; };
+		6155DB151E75776E00E21190 /* UserAgreement.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserAgreement.swift; sourceTree = "<group>"; };
 		61806B451E6D475000DFF905 /* UsefulExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsefulExtension.swift; sourceTree = "<group>"; };
 		61806B471E6D4A1800DFF905 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		61806B4A1E6D56D400DFF905 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				610801EC1E6ED61B00E2EA33 /* TopicCell.swift */,
+				6155DB151E75776E00E21190 /* UserAgreement.swift */,
 				610801EF1E6ED70400E2EA33 /* FilterHeader.swift */,
 				6155DB051E71302800E21190 /* RecordingCell.swift */,
 				6155DB111E72D47900E21190 /* numberOfQLabel+admob.swift */,
@@ -314,6 +317,7 @@
 				61806B501E6DC29A00DFF905 /* QuestionViewController.swift in Sources */,
 				61E9A17C1E6D252200194D01 /* HomeViewController.swift in Sources */,
 				61806B4B1E6D56D400DFF905 /* User.swift in Sources */,
+				6155DB161E75776E00E21190 /* UserAgreement.swift in Sources */,
 				61E9A17A1E6D252200194D01 /* AppDelegate.swift in Sources */,
 				610801EB1E6E9DF300E2EA33 /* Recording.swift in Sources */,
 				6155DB121E72D47900E21190 /* numberOfQLabel+admob.swift in Sources */,
@@ -436,6 +440,7 @@
 				CODE_SIGN_ENTITLEMENTS = EnglishGuess/EnglishGuess.entitlements;
 				DEVELOPMENT_TEAM = 4ANE8KXCD8;
 				INFOPLIST_FILE = EnglishGuess/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vanness-wu.EnglishGuess";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -451,6 +456,7 @@
 				CODE_SIGN_ENTITLEMENTS = EnglishGuess/EnglishGuess.entitlements;
 				DEVELOPMENT_TEAM = 4ANE8KXCD8;
 				INFOPLIST_FILE = EnglishGuess/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.vanness-wu.EnglishGuess";
 				PRODUCT_NAME = "$(TARGET_NAME)";

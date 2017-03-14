@@ -63,9 +63,12 @@ class HomeViewController: UIViewController {
     override func viewWillLayoutSubviews() {
         setupStatusView()
         setupCategoryView()
-        setupTitleImageView()
+        if let window = UIApplication.shared.keyWindow {
+         if window.frame.height > 500 {
+         setupTitleImageView()
+            }
+       }
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         updateLabelCount()
         checkVIP()
@@ -145,6 +148,16 @@ class HomeViewController: UIViewController {
         
     }
     
+    fileprivate let foodImageView = UIImageView.makeBackgroundImageView(withImage: #imageLiteral(resourceName: "food"))
+    fileprivate let abstractImageView = UIImageView.makeBackgroundImageView(withImage: #imageLiteral(resourceName: "abstract"))
+    fileprivate let peopleImageView = UIImageView.makeBackgroundImageView(withImage: #imageLiteral(resourceName: "people"))
+    fileprivate let lifeImageView = UIImageView.makeBackgroundImageView(withImage: #imageLiteral(resourceName: "life"))
+    fileprivate let natureImageView = UIImageView.makeBackgroundImageView(withImage: #imageLiteral(resourceName: "nature"))
+    fileprivate let advanceImageView = UIImageView.makeBackgroundImageView(withImage:#imageLiteral(resourceName: "advance") )
+
+    
+    
+    
     func setupCategoryView() {
         let categoryView = UIView()
         view.addSubview(categoryView)
@@ -163,9 +176,28 @@ class HomeViewController: UIViewController {
         cat4Button.anchor(cat3Button.topAnchor, left: categoryView.centerXAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 2.5, bottomConstant: 0, rightConstant: 5, widthConstant: btnWidth, heightConstant: btnWidth)
         cat1Button.anchor(nil, left: cat3Button.leftAnchor, bottom: cat3Button.topAnchor, right: cat3Button.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
         cat2Button.anchor(nil, left: cat4Button.leftAnchor, bottom: cat4Button.topAnchor, right: cat4Button.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
-        
         cat5Button.anchor(cat3Button.bottomAnchor, left: cat3Button.leftAnchor, bottom: nil, right: cat3Button.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
         cat6Button.anchor(cat4Button.bottomAnchor, left: cat4Button.leftAnchor, bottom: nil, right: cat4Button.rightAnchor, topConstant: 5, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: btnWidth)
+        cat1Button.addSubview(foodImageView)
+        foodImageView.anchor(cat1Button.topAnchor, left: cat1Button.leftAnchor, bottom: cat1Button.bottomAnchor, right: cat1Button.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        cat2Button.addSubview(abstractImageView)
+        abstractImageView.anchor(cat2Button.topAnchor, left: cat2Button.leftAnchor, bottom: cat2Button.bottomAnchor, right: cat2Button.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        cat3Button.addSubview(lifeImageView)
+        lifeImageView.anchor(cat3Button.topAnchor, left: cat3Button.leftAnchor, bottom: cat3Button.bottomAnchor, right: cat3Button.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        cat4Button.addSubview(natureImageView)
+        natureImageView.anchor(cat4Button.topAnchor, left: cat4Button.leftAnchor, bottom: cat4Button.bottomAnchor, right: cat4Button.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        cat5Button.addSubview(peopleImageView)
+        peopleImageView.anchor(cat5Button.topAnchor, left: cat5Button.leftAnchor, bottom: cat5Button.bottomAnchor, right: cat5Button.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        cat6Button.addSubview(advanceImageView)
+        advanceImageView.anchor(cat6Button.topAnchor, left: cat6Button.leftAnchor, bottom: cat6Button.bottomAnchor, right: cat6Button.rightAnchor, topConstant: 10, leftConstant: 10, bottomConstant: 10, rightConstant: 10, widthConstant: 0, heightConstant: 0)
+        
+        cat1Button.backgroundColor = UIColor.guessPink
+        cat2Button.backgroundColor = UIColor.guessPurple
+        cat3Button.backgroundColor = UIColor.guessBlue
+        cat4Button.backgroundColor = UIColor.guessYellow
+        cat5Button.backgroundColor = UIColor.guessGreen
+        cat6Button.backgroundColor = UIColor.guessGray
+        
         
     }
     

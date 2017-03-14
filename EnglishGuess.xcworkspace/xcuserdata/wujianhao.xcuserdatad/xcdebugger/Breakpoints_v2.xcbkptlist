@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "EnglishGuess/LoginViewController.swift"
-            timestampString = "510942521.437661"
+            filePath = "EnglishGuess/IAPHelper.swift"
+            timestampString = "511203286.830106"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "373"
-            endingLineNumber = "373"
-            landmarkName = "customFBLogin()"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
+            landmarkName = "paymentQueue(_:updatedTransactions:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "EnglishGuess/LoginViewController.swift"
-            timestampString = "510942535.302138"
+            filePath = "EnglishGuess/IAPHelper.swift"
+            timestampString = "511203300.310334"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "360"
-            endingLineNumber = "360"
-            landmarkName = "loginButton(_:didCompleteWith:error:)"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
+            landmarkName = "paymentQueue(_:updatedTransactions:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -41,13 +41,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "EnglishGuess/LoginViewController.swift"
-            timestampString = "510942536.07805"
+            filePath = "EnglishGuess/IAPHelper.swift"
+            timestampString = "511203302.294112"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "361"
-            endingLineNumber = "361"
-            landmarkName = "loginButton(_:didCompleteWith:error:)"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
+            landmarkName = "paymentQueue(_:updatedTransactions:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
