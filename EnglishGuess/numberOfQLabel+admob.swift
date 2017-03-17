@@ -30,7 +30,7 @@ class TodayCompletedQuestionLabel:UILabel, GADRewardBasedVideoAdDelegate {
     var delegateController:UIViewController?
     func update(){
         if String(UserDefaults.numberOfQInToday()) == UserDefaults.userAnswerQuota() {
-           text = "次數已滿 點擊回覆"
+           text = "次數已滿 點擊回復"
         } else {
             text = "今日答錯題數:\(UserDefaults.numberOfQInToday())/\(UserDefaults.userAnswerQuota())"
         }

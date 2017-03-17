@@ -19,7 +19,11 @@ class RecordingCell: TopicCell {
     override var recording: Recording?{
         didSet{
             self.topicLabel.text = "\(recording?.category ?? "") : \(recording?.chAnswer ?? "")"
-        self.infoLabel.text = "\(recording?.totalClick ?? 0)人答題 答對率\((recording?.correctRate ?? 0) * 100 ) %"
+            if let correctRate = recording?.correctRate {
+              let  totalCorrectRate = String(format: "%.2f", correctRate*100)
+                self.infoLabel.text = "\(recording?.totalClick ?? 0)人答題 答對率\(totalCorrectRate) %"
+            }
+            
         self.likeLabel.text = "\(recording?.likes ?? 0)"
         self.dislikeLabel.text = "\(recording?.dislikes ?? 0)"
         

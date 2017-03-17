@@ -10,15 +10,17 @@ import Foundation
 import LBTAComponents
 import Firebase
 import AVFoundation
+import GoogleMobileAds
 
-class QuestionViewController: UITableViewController {
+class QuestionViewController: UITableViewController,GADBannerViewDelegate {
     
     let cellId = "cellId"
     let headerId = "headerId"
+    let footerId = "footerId"
     var category:String = ""
     var recordingDict = [String:AnyObject]()
     var recordings = [Recording]()
-    
+    var bannerView = GADBannerView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,14 +28,22 @@ class QuestionViewController: UITableViewController {
         tableView.register(TopicCell.self, forCellReuseIdentifier: cellId)
         tableView.register(FilterHeader.self, forHeaderFooterViewReuseIdentifier: headerId)
         tableView.sectionHeaderHeight = 50
+        tableView.register(AdsFooter.self, forHeaderFooterViewReuseIdentifier: footerId)
+        tableView.sectionFooterHeight = 50
+        
         fetchRecordings()
         let refreshImage = UIImage(named: "refresh")?.withRenderingMode(.alwaysTemplate)
         let searchBarButtonItem = UIBarButtonItem(image: refreshImage, style: .plain, target: self, action: #selector(fetchRecordings))
         navigationItem.rightBarButtonItems = [searchBarButtonItem]
         
         
+        bannerView.backgroundColor = UIColor.white
+        bannerView.adUnitID = "ca-app-pub-8818309556860374/5149662445"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
         
-    }
+        
+        }
     
     override func viewWillAppear(_ animated: Bool) {
             numberOfQLabel.update()
@@ -126,10 +136,13 @@ class QuestionViewController: UITableViewController {
             }
         }
      //   tableView.reloadData()
-        
-        
     }
     
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: footerId) as! AdsFooter
+        footer.bannerView = bannerView
+        return footer
+    }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerId) as! FilterHeader

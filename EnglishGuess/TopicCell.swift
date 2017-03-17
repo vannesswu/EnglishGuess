@@ -40,15 +40,17 @@ class TopicCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     let spinner = UIActivityIndicatorView.spinner
-    let profileImageView: CachedImageView = {
+    lazy var profileImageView: CachedImageView = {
         let iv = CachedImageView()
         iv.contentMode = .scaleAspectFill
         iv.layer.cornerRadius = 30
+        iv.clipsToBounds = true
         return iv
     }()
     let nameLabel:UILabel = {
         let bl = UILabel()
         bl.adjustsFontSizeToFitWidth = true
+        bl.minimumScaleFactor = 10
         return bl
     }()
     let likeLabel:UILabel = {
@@ -80,6 +82,7 @@ class TopicCell: UITableViewCell {
         return bl
     }()
     
+    var imgWidth:CGFloat = 0
     func setupViews(){
         addSubview(profileImageView)
         addSubview(nameLabel)
@@ -88,8 +91,8 @@ class TopicCell: UITableViewCell {
         addSubview(dislikeLabel)
         addSubview(dislikeImageView)
         addSubview(timeStampLabel)
-        let width = frame.size.width
-        profileImageView.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: width/6, heightConstant: 0)
+        imgWidth = CGFloat(frame.size.width)
+        profileImageView.anchor(topAnchor, left: leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 5, widthConstant: 60, heightConstant: 0)
         profileImageView.addSubview(spinner)
         spinner.anchorCenterSuperview()
         spinner.startAnimating()
@@ -100,7 +103,7 @@ class TopicCell: UITableViewCell {
         dislikeImageView.anchor(nil, left: nil, bottom: nil, right: dislikeLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
         dislikeImageView.anchorCenterYToSuperview()
         dislikeLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: timeStampLabel.leftAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 30, heightConstant: 0)
-        timeStampLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 5, widthConstant: width/4, heightConstant: 0)
+        timeStampLabel.anchor(profileImageView.topAnchor, left: nil, bottom: profileImageView.bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 5, widthConstant: imgWidth/4, heightConstant: 0)
     }
     
     

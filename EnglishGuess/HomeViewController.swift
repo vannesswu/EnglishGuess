@@ -73,16 +73,18 @@ class HomeViewController: UIViewController {
         updateLabelCount()
         checkVIP()
     }
-    
+    var ischeckVIP = true
     func checkVIP(){
+        if ischeckVIP {
         products = []
         EnglishGuessVIP.share.store.requestProducts{success, products in
-        if success {
+        if success  {
+                self.ischeckVIP = false
                 self.products = products!
             }
         }
+      }
     }
-    
     
     func updateLabelCount() {
         todayCompletedQuestionLabel.update()

@@ -315,11 +315,21 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
         setupFBLoginButton()
         
     }
-    
+    let tipLabel:UILabel = {
+        let label = UILabel()
+        label.text = "點擊圖示更換頭像或FB登入沿用大頭照"
+        label.textColor = UIColor.white
+        label.font = UIFont.systemFont(ofSize: 14)
+        return label
+    }()
+        
     func setupProfileImageView() {
         view.addSubview(profileImageView)
+        view.addSubview(tipLabel)
         profileImageView.anchorCenterXToSuperview()
         profileImageView.anchor(nil, left: nil, bottom: loginRegisterSegmentedControl.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 12, rightConstant: 0, widthConstant: 100, heightConstant: 100)
+        tipLabel.anchorCenterXToSuperview()
+        tipLabel.anchor(nil, left: nil, bottom: profileImageView.topAnchor, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 0, widthConstant: 250, heightConstant: 20)
         
     }
     
@@ -421,9 +431,15 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             self.present(isUserConfirmAlert, animated: true, completion: nil)
             return
         }
-        FBSDKLoginManager().logIn(withReadPermissions: ["email","public_profile"], from: self) { (result, err) in
-            if err != nil {
-                print("Custom FB Login failed:", err ?? "")
+        FBSDKLoginManager().logIn(withReadPermissions: ["email","public_profile"], from: self) { (result, error) in
+            if error != nil || !(result?.grantedPermissions?.contains("email") ?? false) {
+                let alertController = UIAlertController(title: "Oop 出錯了", message: "\(error?.localizedDescription ?? "") or 請確認email授權", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                alertController.addAction(okAction)
+                self.present(alertController, animated: true, completion: nil)
+                print(error ?? "")
+
+                print("Custom FB Login failed:", error ?? "")
                 return
             }
             self.handleFBLogin()
@@ -433,13 +449,14 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     func handleFBLogin() {
   
         let credential = FIRFacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
-        
+        self.handleUserLogin()
         FIRAuth.auth()?.signIn(with: credential, completion: { (user, error) in
             if error != nil {
+            
                 print("Something went wrong with our FB user: ", error ?? "")
                 return
             }
-            self.handleUserLogin()
+            
             print("Successfully logged in with our user: ", user ?? "")
             
             FBSDKGraphRequest(graphPath: "/me", parameters: ["fields": "id, name, email"]).start { (connection, result, err) in

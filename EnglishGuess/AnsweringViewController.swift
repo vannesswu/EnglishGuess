@@ -35,6 +35,8 @@ class AnsweringViewController:UIViewController {
         if let id = recording?.id ,let categoary = self.categoary {
         recordRef = FIRDatabase.database().reference().child("users-recordings").child(categoary).child(id)
         }
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.dismissKeyboard))
+        view.addGestureRecognizer(tap)
         view.backgroundColor = UIColor.white
         recordingSession = AVAudioSession.sharedInstance()
         do {
@@ -66,9 +68,13 @@ class AnsweringViewController:UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(AnsweringViewController.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(AnsweringViewController.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
+    func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
     
     func dismissVC() {
-        if checkUserIsAnswer {
+        if checkUserIsAnswer || updateingLikes {
             present(remindUserAnswerAlert, animated: true, completion: nil)
             return
         }
@@ -84,7 +90,7 @@ class AnsweringViewController:UIViewController {
             return
         
         }
-        
+        audioPlayer.stop()
         if UserDefaults.numberOfQInToday() < UserDefaults.userAnswerQuotaForJudge() {
             let randomIndex = Int(arc4random_uniform(UInt32(recordings.count)))
             anserTextField.text = ""
@@ -129,7 +135,8 @@ class AnsweringViewController:UIViewController {
         if isNeedAddHeight || show == false {
 //            let userInfo = notification.userInfo ?? [:]
 //            let keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
-            let adjustmentHeight:CGFloat = 100  * (show ? 1 : -1)
+            let height:CGFloat = view.frame.height > 600 ? 100 : 120
+            let adjustmentHeight:CGFloat = height  * (show ? 1 : -1)
             
             self.view.frame = self.view.frame.offsetBy(dx: 0, dy: -adjustmentHeight)
             isNeedAddHeight = false
@@ -206,7 +213,7 @@ class AnsweringViewController:UIViewController {
         let tf = UITextField()
         tf.delegate = self
         tf.textAlignment = .center
-        tf.placeholder = "請輸入您的答案"
+        tf.placeholder = "請輸入中文答案"
         return tf
     }()
     lazy var checkAnswerButton:UIButton = {
@@ -290,7 +297,13 @@ class AnsweringViewController:UIViewController {
         likeLabel.text = "\(self.recording?.likes ?? 0 )"
         dislikeLabel.text = "\(self.recording?.dislikes ?? 0 )"
     }
-    
+    var updateingLikes = false {
+        didSet {
+            alertTitle = updateingLikes ? "請稍等按讚數更新" : "您尚未答題"
+            alertMessage = updateingLikes ? "" : "請輸入答案並選擇確認"
+        }
+        
+    }
     func setupProviderView() {
         view.addSubview(providerLabel)
         view.addSubview(providerProfileImageView)
@@ -309,7 +322,7 @@ class AnsweringViewController:UIViewController {
     }
     
     func upadteLikes() {
-        
+        updateingLikes = true
         recordRef?.runTransactionBlock({ (currentData: FIRMutableData) -> FIRTransactionResult in
             if var post = currentData.value as? [String : AnyObject], let uid = FIRAuth.auth()?.currentUser?.uid {
                 var stars : Dictionary<String, Bool>
@@ -332,12 +345,14 @@ class AnsweringViewController:UIViewController {
             }
             return FIRTransactionResult.success(withValue: currentData)
         }) { (error, committed, snapshot) in
+            self.updateingLikes = false
             if let error = error {
                 print(error.localizedDescription)
             }
         }
     }
     func upadteDislikes() {
+        updateingLikes = true
         recordRef?.runTransactionBlock({ (currentData: FIRMutableData) -> FIRTransactionResult in
             if var post = currentData.value as? [String : AnyObject], let uid = FIRAuth.auth()?.currentUser?.uid {
                 var stars : Dictionary<String, Bool>
@@ -360,6 +375,7 @@ class AnsweringViewController:UIViewController {
             }
             return FIRTransactionResult.success(withValue: currentData)
         }) { (error, committed, snapshot) in
+            self.updateingLikes = false
             if let error = error {
                 print(error.localizedDescription)
             }
@@ -420,18 +436,23 @@ class AnsweringViewController:UIViewController {
             }
         }
     }
+    var alertTitle = "您尚未答題"
+    var alertMessage = "請輸入答案並選擇確認"
     
     lazy var remindUserAnswerAlert:UIAlertController = {
-        let at = UIAlertController(title: "您尚未答題", message: "請輸入答案並選擇確認", preferredStyle: .alert)
+        let at = UIAlertController(title: self.alertTitle, message: self.alertMessage, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
         at.addAction(okAction)
         return at
     }()
     
     var checkUserIsAnswer = false
-    
+    var checkDict:[String:Bool] = [:]
     func playrecording() {
+        if checkDict["\(recording?.id)"] != true {
         checkUserIsAnswer = true
+        }
+        checkDict["\(recording?.id)"] = true
         PlayButton.isEnabled = false
         PlayButton.alpha = 0.5
         if let data = recordingData {

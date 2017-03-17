@@ -93,7 +93,6 @@ extension IAPHelper: SKProductsRequestDelegate {
     print("Loaded list of products...")
     productsRequestCompletionHandler?(true, products)
     clearRequestAndHandler()
-
     for p in products {
       print("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
     }
