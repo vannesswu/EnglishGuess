@@ -63,7 +63,18 @@ struct Topic {
         "豆漿":"soybean milk",
         "蚵仔煎":"oyster omelet",
         "鹽酥雞":"fried chicken",
-        "大腸包小腸":"taiwanese sausage with sticky rice"]
+        "大腸包小腸":"taiwanese sausage with sticky rice",
+        "芭樂":"guava",
+        "奇異果":"kiwi",
+        "金針菇":"needle mushroom",
+        "花椰菜":"broccoli",
+        "鳳梨酥":"pineapple cake",
+        "麻糬":"mochi",
+        "蛋餅":"chinese omelet",
+        "板條":"flat noodles",
+        "涼麵":"cold noodles",
+        "糖葫蘆":"tomatoes on sticks"
+        ]
     let abstractTopic = ["罪惡感":"guilty",
         "意見":"opinion",
         "背黑鍋":"to carry the can",

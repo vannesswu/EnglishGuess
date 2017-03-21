@@ -11,8 +11,10 @@ import UIKit
 import LBTAComponents
 import Firebase
 import AVFoundation
+import Speech
 
-class AnsweringViewController:UIViewController {
+
+class AnsweringViewController:UIViewController,SFSpeechRecognizerDelegate {
     
     var categoary:String?
     var recording:Recording?
@@ -30,8 +32,30 @@ class AnsweringViewController:UIViewController {
     }()
     
     
+    
+    var isTranslateButtonEnabled = false
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 10, *) {
+        SFSpeechRecognizer.requestAuthorization { (authStatus) in
+            switch authStatus {
+            case .authorized:
+                self.isTranslateButtonEnabled = true
+                self.translateButton.isHidden = false
+            case .denied:
+                self.isTranslateButtonEnabled = false
+                DispatchQueue.main.async {
+                    self.translateButton.isHidden = true
+                }
+            case .restricted:
+                self.isTranslateButtonEnabled = false
+            case .notDetermined:
+                self.isTranslateButtonEnabled = false
+            }
+          }
+        }
+        
+        
         if let id = recording?.id ,let categoary = self.categoary {
         recordRef = FIRDatabase.database().reference().child("users-recordings").child(categoary).child(id)
         }
@@ -96,6 +120,9 @@ class AnsweringViewController:UIViewController {
             anserTextField.text = ""
             anserTextField.isEnabled = true
             checkAnswerButton.isEnabled = true
+            translateButton.isEnabled = false
+            PlayButton.isEnabled = true
+            PlayButton.alpha = 1
             checkAnswerButton.alpha = 1
             showhandlingupload()
             recording = recordings[randomIndex]
@@ -107,7 +134,11 @@ class AnsweringViewController:UIViewController {
             fetchRecordingData { (data) in
                 self.blackView.removeFromSuperview()
                 self.recordingData = data
+                self.isShowTranslate = false
                 self.topicLabel.text = "答案為: ?? "
+                self.topicLabel.font = UIFont.systemFont(ofSize: 40)
+                self.translateButton.setTitle("翻譯蒟蒻", for: .normal)
+                self.translateButton.alpha = 0.5
                 self.updateProviderInfo()
             }
         } else {
@@ -135,7 +166,7 @@ class AnsweringViewController:UIViewController {
         if isNeedAddHeight || show == false {
 //            let userInfo = notification.userInfo ?? [:]
 //            let keyboardFrame = (userInfo[UIKeyboardFrameBeginUserInfoKey] as! NSValue).cgRectValue
-            let height:CGFloat = view.frame.height > 600 ? 100 : 120
+            let height:CGFloat = view.frame.height > 600 ? 120 : 140
             let adjustmentHeight:CGFloat = height  * (show ? 1 : -1)
             
             self.view.frame = self.view.frame.offsetBy(dx: 0, dy: -adjustmentHeight)
@@ -228,7 +259,20 @@ class AnsweringViewController:UIViewController {
         btn.addTarget(self, action: #selector(checkAnswer), for: .touchUpInside)
         return btn
     }()
-    
+    lazy var translateButton:UIButton = {
+        let btn = UIButton()
+        btn.setTitle("翻譯蒟蒻", for: .normal)
+        btn.layer.shadowColor = UIColor.black.cgColor
+        btn.layer.shadowOffset = CGSize(width: -1.5, height: 1.5)
+        btn.backgroundColor = UIColor.darkBlue
+        btn.layer.cornerRadius = 15
+        btn.layer.shadowOpacity = 0.8
+        btn.layer.shadowRadius = 1.0
+        btn.addTarget(self, action: #selector(showtranslate), for: .touchUpInside)
+        btn.isEnabled = false
+        btn.alpha = 0.5
+        return btn
+    }()
     
     let separatorView = UIView.makeSeparatorView()
     func setupViews() {
@@ -236,7 +280,7 @@ class AnsweringViewController:UIViewController {
         view.addSubview(anserTextField)
         view.addSubview(checkAnswerButton)
         view.addSubview(separatorView)
-       
+        view.addSubview(translateButton)
         PlayButton.anchorCenterSuperview()
         PlayButton.anchor(nil, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 150, heightConstant: 150)
         anserTextField.anchor(PlayButton.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 15, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 140, heightConstant: 30)
@@ -244,7 +288,12 @@ class AnsweringViewController:UIViewController {
         separatorView.anchor(nil, left:anserTextField.leftAnchor, bottom: anserTextField.bottomAnchor, right: anserTextField.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 1)
         checkAnswerButton.anchor(anserTextField.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 15, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 140, heightConstant: 30)
         checkAnswerButton.anchorCenterXToSuperview()
+       if #available(iOS 10, *) {
         
+        translateButton.anchor(checkAnswerButton.bottomAnchor, left: nil, bottom: nil, right: nil, topConstant: 15, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 140, heightConstant: 30)
+        translateButton.anchorCenterXToSuperview()
+        
+        }
         
         
     }
@@ -386,8 +435,10 @@ class AnsweringViewController:UIViewController {
     func checkAnswer() {
         
         anserTextField.resignFirstResponder()
-        guard let userAnswer = anserTextField.text , userAnswer != "" , let answer = recording?.chAnswer else { return }
+        guard let userAnswer = anserTextField.text?.replacingOccurrences(of: " ", with: "") , userAnswer != "" , let answer = recording?.chAnswer else { return }
         checkUserIsAnswer = false
+        translateButton.isEnabled = true
+        translateButton.alpha = 1
         guard let uid = FIRAuth.auth()?.currentUser?.uid else { return }
         UserDefaults.standard.set(numberOfQ, forKey: uid+Date.returnTodayString())
         numberOfQLabel.update()
@@ -415,6 +466,16 @@ class AnsweringViewController:UIViewController {
          }
         }
     }
+    
+    var isShowTranslate = false
+    func showtranslate() {
+        isShowTranslate = !isShowTranslate
+        topicLabel.text = isShowTranslate ? translateText : "答案為:\(self.recording?.chAnswer ?? "")\n\(self.recording?.engAnswer ?? "")"
+        topicLabel.font = isShowTranslate ? UIFont.systemFont(ofSize: 15) : UIFont.systemFont(ofSize: 40)
+        translateButton.setTitle(isShowTranslate ? "顯示答案" : "翻譯蒟蒻", for: .normal)
+    }
+    
+    
     let resultView = UIImageView()
     func animateTheCheckResult(_ success:Bool) {
         resultView.contentMode = .scaleAspectFit
@@ -448,7 +509,36 @@ class AnsweringViewController:UIViewController {
     
     var checkUserIsAnswer = false
     var checkDict:[String:Bool] = [:]
+    var translateText = ""
     func playrecording() {
+        
+        
+        if #available(iOS 10, *) {
+                if isTranslateButtonEnabled {
+                    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                    let videoURL = documentsURL.appendingPathComponent("recording.m4a")
+                    //what ever your filename and extention
+                    do {
+                        try self.recordingData?.write(to: videoURL, options: .atomic)
+                    } catch {
+                        print(error)
+                    }
+                    // we have access/user permission to speech recognition
+                     let recognizer = SFSpeechRecognizer(locale: Locale.init(identifier: "en-US"))!
+                    //let recognizer = SFSpeechRecognizer()
+                    let request = SFSpeechURLRecognitionRequest(url: videoURL)
+                    recognizer.recognitionTask(with: request, resultHandler: { (result, error) in
+                        if let error = error {
+                            print("something went wrong: \(error)")
+                        } else {
+                            if let text = result?.bestTranscription.formattedString {
+                                self.translateText = text
+                            }
+                        }
+                    })
+                }
+             }
+    
         if checkDict["\(recording?.id)"] != true {
         checkUserIsAnswer = true
         }
