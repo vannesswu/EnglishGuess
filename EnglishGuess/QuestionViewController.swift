@@ -31,7 +31,7 @@ class QuestionViewController: UITableViewController,GADBannerViewDelegate {
         tableView.register(AdsFooter.self, forHeaderFooterViewReuseIdentifier: footerId)
         tableView.sectionFooterHeight = 50
         
-        fetchRecordings()
+  //      fetchRecordings()
         let refreshImage = UIImage(named: "refresh")?.withRenderingMode(.alwaysTemplate)
         let searchBarButtonItem = UIBarButtonItem(image: refreshImage, style: .plain, target: self, action: #selector(fetchRecordings))
         navigationItem.rightBarButtonItems = [searchBarButtonItem]
@@ -46,6 +46,7 @@ class QuestionViewController: UITableViewController,GADBannerViewDelegate {
         }
     
     override func viewWillAppear(_ animated: Bool) {
+            fetchRecordings()
             numberOfQLabel.update()
     }
     let blackView = UIView()
@@ -74,7 +75,8 @@ class QuestionViewController: UITableViewController,GADBannerViewDelegate {
     func setupTitleView() {
         let titleView = UIView()
         titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playad)))
-        titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleView.anchor(nil, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 200, heightConstant: 40)
+        titleView.anchorCenterSuperview()
         let containerView = UIView()
         titleView.addSubview(containerView)
         containerView.addSubview(numberOfQLabel)

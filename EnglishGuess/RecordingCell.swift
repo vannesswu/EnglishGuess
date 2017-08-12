@@ -76,7 +76,7 @@ class RecordingCell: TopicCell {
         addSubview(dislikeImageView)
         addSubview(timeStampLabel)
         topicLabel.anchor(topAnchor, left: leftAnchor, bottom: nil, right: nil, topConstant: 5, leftConstant: 35, bottomConstant: 0, rightConstant: 0, widthConstant: 120, heightConstant: 40)
-        infoLabel.anchor(topicLabel.bottomAnchor, left: leftAnchor, bottom: bottomAnchor, right: playButton.leftAnchor, topConstant: 5, leftConstant: 5, bottomConstant: 5, rightConstant: 0, widthConstant: 0, heightConstant: 0)
+        infoLabel.anchor(topicLabel.bottomAnchor, left: topicLabel.leftAnchor, bottom: bottomAnchor, right: nil, topConstant: 5, leftConstant:0, bottomConstant: 10, rightConstant: 0, widthConstant: 0, heightConstant: 0)
         playButton.anchor(nil, left: nil, bottom: bottomAnchor, right: rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 5, rightConstant: 20, widthConstant: 32, heightConstant: 32)
         
         likeImageView.anchor(nil, left: topicLabel.rightAnchor, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 15, heightConstant: 15)
@@ -89,9 +89,15 @@ class RecordingCell: TopicCell {
     }
     
     func playRecording(){
+        
         if let url = recording?.recordingUrl {
-        userFilesViewController?.playrecording(url)
+            userFilesViewController?.playrecording(url,cell:self)
         }
+    }
+    
+    func changePlayState(isplay: Bool) {
+        playButton.isEnabled = !isplay
+        playButton.alpha = isplay ? 0.8 : 1
     }
     
     

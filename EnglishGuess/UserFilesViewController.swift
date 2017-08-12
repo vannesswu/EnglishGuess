@@ -20,7 +20,15 @@ class UserFilesViewController : UITableViewController {
     let cellId = "recordingCellId"
     var audioPlayer:AVAudioPlayer!
     var recordingSession: AVAudioSession!
-    
+    var playingCell:RecordingCell?
+    var playingIndex:Int?{
+        didSet{
+            if let cellIndex = playingIndex {
+                playingCell = tableView.cellForRow(at: IndexPath(row: cellIndex, section: 0)) as! RecordingCell
+                
+            }
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchUseruploadIDs()
@@ -38,7 +46,14 @@ class UserFilesViewController : UITableViewController {
         } catch {
             // failed to record!
         }
-
+        tableView.allowsSelection = false
+        tableView.tableFooterView = UIView()
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        audioPlayer = nil
     }
     
     let titleView = UIView()
@@ -121,7 +136,7 @@ class UserFilesViewController : UITableViewController {
         return cell
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
+        return 80
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
      deleteIndexPath.append(indexPath)
@@ -205,16 +220,25 @@ class UserFilesViewController : UITableViewController {
 extension UserFilesViewController: AVAudioPlayerDelegate {
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        playingCell?.changePlayState(isplay: false)
         print ("播放結束")
     }
 
-    func playrecording(_ url:String) {
+    func playrecording(_ url:String,cell:RecordingCell) {
+        let tempIndex = tableView.indexPath(for: cell)?.row
+        if (audioPlayer != nil && audioPlayer.isPlaying) {
+           audioPlayer.stop()
+           playingCell?.changePlayState(isplay: false)
+        }
+        
         fetchRecordingData(url) { (data) in
             self.audioPlayer = try? AVAudioPlayer(data: data)
             self.audioPlayer.delegate = self
             if self.audioPlayer.prepareToPlay() {
                 print ("開始播放")
                 self.audioPlayer.play()
+                self.playingIndex = tempIndex
+                cell.changePlayState(isplay: true)
             }
         }
         

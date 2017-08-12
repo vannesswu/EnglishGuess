@@ -182,7 +182,8 @@ class AnsweringViewController:UIViewController,SFSpeechRecognizerDelegate {
     func setupTitleView() {
         let titleView = UIView()
         titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playad)))
-        titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        titleView.anchor(nil, left: nil, bottom: nil, right: nil, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 200, heightConstant: 40)
+        titleView.anchorCenterSuperview()
         let containerView = UIView()
         titleView.addSubview(containerView)
         containerView.addSubview(numberOfQLabel)
@@ -386,6 +387,7 @@ class AnsweringViewController:UIViewController,SFSpeechRecognizerDelegate {
                 }
                 DispatchQueue.main.async {
                     self.likeLabel.text = "\(count)"
+                    
                 }
                 post["likes"] = count as AnyObject?
                 post["user_like"] = stars as AnyObject?

@@ -318,7 +318,6 @@ class HomeViewController: UIViewController {
             let vc = LoginViewController()
             vc.homeViewController = self
             self.present(vc, animated: true, completion: nil)
-            print ("here")
         }
     }
    

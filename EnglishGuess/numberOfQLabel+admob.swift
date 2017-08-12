@@ -61,6 +61,8 @@ class TodayCompletedQuestionLabel:UILabel, GADRewardBasedVideoAdDelegate {
     func rewardBasedVideoAd(_ rewardBasedVideoAd: GADRewardBasedVideoAd,
                             didFailToLoadWithError error: Error) {
     print("Reward based video ad failed to load: \(error.localizedDescription)")
+    inProcess = false
+    reloadAd()
     }
     
     func rewardBasedVideoAdDidReceive(_ rewardBasedVideoAd: GADRewardBasedVideoAd) {
