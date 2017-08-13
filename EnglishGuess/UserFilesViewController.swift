@@ -133,6 +133,13 @@ class UserFilesViewController : UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! RecordingCell
         cell.recording = recordings[indexPath.row]
         cell.userFilesViewController = self
+        if let index = playingIndex, indexPath.row == index {
+            cell.changePlayState(isplay: true)
+        } else {
+            cell.changePlayState(isplay: false)
+        }
+        
+        
         return cell
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -221,6 +228,7 @@ extension UserFilesViewController: AVAudioPlayerDelegate {
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         playingCell?.changePlayState(isplay: false)
+        playingIndex = nil
         print ("播放結束")
     }
 

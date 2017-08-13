@@ -43,16 +43,19 @@ class RecordViewController : UIViewController {
         let changeTopicBarButtonItem = UIBarButtonItem(title: "換一題", style: .plain, target: self, action: #selector(chooseRandomTopic))
         navigationItem.rightBarButtonItems = [changeTopicBarButtonItem]
         
-        
-    }
-    override func viewWillLayoutSubviews() {
         setupTitleView()
         setupTopicView()
         setupRecordButtonView()
         setupHintView()
-        
+    }
+  
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
         
     }
+    
+    
     let topicLabel :UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -93,7 +96,7 @@ class RecordViewController : UIViewController {
         
     }
     
-    let timerLabel:UILabel = {
+    lazy var timerLabel:UILabel = {
         let label = UILabel()
         label.text = "15.0"
         label.textAlignment = .center
@@ -223,27 +226,27 @@ class RecordViewController : UIViewController {
         countdownTime = 15.0
    //     countdowntimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(countdownTimer), userInfo: nil, repeats: true)
         
+        
         timer = CADisplayLink(target: self, selector: #selector(countdownTimer))
-        timer?.add(to: .main, forMode: .defaultRunLoopMode)
-        timer?.add(to: .main, forMode: .UITrackingRunLoopMode)
+        timer?.add(to: .main, forMode: .commonModes)
+//        timer?.add(to: .main, forMode: .UITrackingRunLoopMode)
         timer?.frameInterval = 6
         
         buttonEnable(false)
   
         
     }
+    
     func countdownTimer() {
-        
         countdownTime -= 0.1
-        
-          self.timerLabel.text = "\(self.numberFormatter.string(from: NSNumber(value: self.countdownTime))!)"
-            if ( self.timerLabel.text == "0.0"){
+         timerLabel.text = "\(self.numberFormatter.string(from: NSNumber(value: self.countdownTime))!)"
+        if ( self.timerLabel.text == "0.0"){
                 self.countdowntimer.invalidate()
                 self.timer?.invalidate()
                 self.timer = nil
                 self.buttonEnable(true)
                 self.audioRecorder.stop()
-        }
+                }
         
     }
     
@@ -286,7 +289,6 @@ class RecordViewController : UIViewController {
                 print(err ?? "")
                 return
             }
-            print("here")
         })
     }
     fileprivate func uploadUserRecordings(values: [String: AnyObject]) {
@@ -335,10 +337,9 @@ class RecordViewController : UIViewController {
         }
     }
     
-    
+    let hintLabel = UILabel()
     func setupHintView() {
         
-        let hintLabel = UILabel()
         hintLabel.numberOfLines = 0
         view.addSubview(hintLabel)
         hintLabel.font = UIFont.systemFont(ofSize: 18)
