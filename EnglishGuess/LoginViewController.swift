@@ -201,10 +201,11 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     let handlingLabel = UILabel()
     func handleUserLogin() {
         
-        if let window = UIApplication.shared.keyWindow {
+    //    if let window = UIApplication.shared.keyWindow {
             
-            window.addSubview(blackView)
-            blackView.fillSuperview()
+            view.addSubview(blackView)
+            view.bringSubview(toFront: blackView)
+            blackView.frame = view.bounds
             blackView.backgroundColor = UIColor.mainBlue
             blackView.addSubview(spinner)
             blackView.addSubview(handlingLabel)
@@ -222,18 +223,19 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
             titleImgeView.tintColor = UIColor.white
             titleImgeView.contentMode = .scaleAspectFit
             blackView.addSubview(titleImgeView)
-            titleImgeView.anchor(blackView.topAnchor, left: blackView.leftAnchor, bottom: nil, right: blackView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: window.frame.height/3)
-        }
+            titleImgeView.anchor(blackView.topAnchor, left: blackView.leftAnchor, bottom: nil, right: blackView.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: view.frame.height/3)
+     //   }
     }
     func transitionAnimate() {
        
         if let window = UIApplication.shared.keyWindow {
          UIView.animate(withDuration: 0.5, animations: {
-            self.blackView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: window.frame.height)
+            self.dismiss(animated: true, completion: nil)
+//            self.blackView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: window.frame.height)
             
          }, completion: { (_) in
-            self.blackView.removeFromSuperview()
-            self.dismiss(animated: true, completion: nil)
+    //        self.blackView.removeFromSuperview()
+      //      self.dismiss(animated: true, completion: nil)
      //       self.blackView.removeFromSuperview()
 
          })
@@ -303,16 +305,22 @@ class LoginViewController:UIViewController ,FBSDKLoginButtonDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.mainBlue
-    
-    }
-    
-    override func viewWillLayoutSubviews() {
         setupInputsContainerView()
         setupLoginRegisterSegmentedControl()
         setupProfileImageView()
         setupUserAgreementView()
         setupLoginRegisterButton()
         setupFBLoginButton()
+    
+    }
+    
+    override func viewWillLayoutSubviews() {
+//        setupInputsContainerView()
+//        setupLoginRegisterSegmentedControl()
+//        setupProfileImageView()
+//        setupUserAgreementView()
+//        setupLoginRegisterButton()
+//        setupFBLoginButton()
         
     }
     let tipLabel:UILabel = {

@@ -51,7 +51,7 @@ class MenuLauncher :NSObject {
                 
                 self.blackView.alpha = 1
                 
-                self.menuView.frame = CGRect(x: window.frame.width/2, y: 0, width: self.menuView.frame.width, height: self.menuView.frame.height)
+                self.menuView.frame = CGRect(x: window.frame.width/2, y: iphoneXHeight, width: self.menuView.frame.width, height: self.menuView.frame.height)
                 
             }, completion: nil)
         }

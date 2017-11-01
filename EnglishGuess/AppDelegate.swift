@@ -9,7 +9,7 @@
 import UIKit
 import FBSDKCoreKit
 import Firebase
-
+var iphoneXHeight:CGFloat = 0
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
+        checkiphoneXHeight()
         window?.rootViewController = UINavigationController(rootViewController: HomeViewController())
         UINavigationBar.appearance().barTintColor = UIColor.mainBlue
         // get rid of black bar underneath navbar
@@ -31,8 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         statusBarBackgroundView.alpha = 0.8
         statusBarBackgroundView.backgroundColor = UIColor.darkBlue
         window?.addSubview(statusBarBackgroundView)
-        window?.addConstraintsWithFormat("H:|[v0]|", views: statusBarBackgroundView)
-        window?.addConstraintsWithFormat("V:|[v0(20)]", views: statusBarBackgroundView)
+        statusBarBackgroundView.anchor(window?.topAnchor, left: window?.leftAnchor, bottom: nil, right: window?.rightAnchor, topConstant: 0, leftConstant: 0, bottomConstant: 0, rightConstant: 0, widthConstant: 0, heightConstant: 20 + iphoneXHeight)
         
         
         FIRApp.configure()
@@ -76,7 +76,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
+    func checkiphoneXHeight() {
+        let height = UIScreen.main.bounds.height
+        iphoneXHeight = height == 812 ? 24 : 0
+    }
 
 }
 
